@@ -20,7 +20,7 @@ async function NotecastRPC(reqBody: ExtendedNextApiRequest['body']) {
     let { data, error } = await supabase.rpc('notecast_search', {
   match_count: 5, 
   query_embedding, 
-  similarity_threshold: 0.01, 
+  similarity_threshold: 0.8, 
   user_id
 })
 

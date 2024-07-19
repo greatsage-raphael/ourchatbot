@@ -11,11 +11,23 @@ import { storage } from "@/utils/firebaseConfig";
 import { getCurrentFormattedDate } from "@/lib/utils";
 import { v4 as uuidv4 } from 'uuid';
 import { Button } from "@/components/ui/button";
-import { array } from "zod";
 import { GeminiGenerate } from "../../scripts/generate"
 import { Answer } from "@/components/ui/Answer/Answer";
 import { LanguageSelect } from "@/components/ui/languageSelect";
 
+
+
+interface tracks {
+  id: number;
+  userid: string;
+  audiourl: string;
+  dateadded: string;
+  maintopic: string;
+  audiolecture: boolean;
+  transcription: string;
+  transcription_token_count: number;
+  embedding: string;
+}
 
 interface lecture {
   userid: string,
@@ -92,7 +104,9 @@ export default function Home() {
   const [chunks, setChunks] = useState<lecture[]>([]);
   const [answer, setAnswer] = useState<string>("");
   const [response, setResponse] = useState<string>("");
-  const [loading, setLoading] = useState<boolean>(false);
+  const [sourcesLoading, setSourcesLoading] = useState<boolean>(false);
+  const [answerLoading, setAnswerLoading] = useState<boolean>(false);
+  const [audioLoading, setAudioLoading] = useState<boolean>(false);
   const [showSettings, setShowSettings] = useState<boolean>(false);
   const [podcastTime, setPodcastTime] = useState<number>(5);
   const [title, setTitle] = useState('Record your voice note');
@@ -101,11 +115,14 @@ export default function Home() {
   const [totalSeconds, setTotalSeconds] = useState(0);
   const [isRecording, setIsRecording] = useState(false);
   const [pdfText, setPdfText] = useState<string>('');
+  const [tracks, setTracks] = useState<tracks[]>([]);
   const [lectures, setLectures] = useState<lecture[]>([]);
   const [name, setName] = useState('');
   const [audioUrl, setAudioUrl] = useState('');
   const [language, setLanguage] = useState<string>('en-US');
   const [voiceName, setVoiceName] = useState<string>(voiceNames["en-US"]);
+  const [date, setDate] = useState("")
+  const [retrievedLectures, setRetrievedLectures] = useState<boolean>(false)
   const { user } = useUser();
 
   //console.log("USER", user)
@@ -202,6 +219,8 @@ export default function Home() {
     };
 
     try {
+      setDate('')
+      const formattedDate = getCurrentFormattedDate();
       const response = await fetch('http://localhost:8000/synthesize', {
         method: 'POST',
         headers: {
@@ -212,11 +231,12 @@ export default function Home() {
 
       const result = await response.json();
       setAudioUrl(result.downloadURL);
+      setDate(formattedDate)
     } catch (error) {
       console.error('Error:', error);
       alert('An error occurred while generating the audio');
     } finally {
-      setLoading(false);
+      return true
     }
   };
 
@@ -226,10 +246,12 @@ export default function Home() {
       alert("Please enter a query.");
       return;
     }
-
+    setRetrievedLectures(false)
     setAnswer("");
     setChunks([]);
-    setLoading(true);
+    setAnswerLoading(true);
+    setSourcesLoading(true)
+    setAudioLoading(true)
 
     const searchResponse = await fetch("/api/search", {
       method: "POST",
@@ -239,15 +261,16 @@ export default function Home() {
       body: JSON.stringify({ query, userid: user?.id })
     });
 
+
     if (!searchResponse.ok) {
-      setLoading(false);
+      setSourcesLoading(false)
       throw new Error(searchResponse.statusText);
     }
 
     const results = await searchResponse.json();
     //console.log("CHUNKS :", Array.isArray(results.data))
     setChunks(results);
-    setLoading(false)
+    setSourcesLoading(false)
 
     const DBsearchResults = results?.map((d: any) => d.content).join("\n\n")
 
@@ -289,9 +312,9 @@ export default function Home() {
     
     //console.log("Internet Results :", internetSearchResults)
 
-    const answer = await GeminiGenerate(DBsearchResults, internetSearchResults, query)
+    const answer = await GeminiGenerate(DBsearchResults, internetSearchResults, query, language, podcastTime)
 
-
+    setAnswerLoading(false);
 
     let stream = '';
 for await (const chunk of answer.stream) {
@@ -305,6 +328,10 @@ try {
   const answer = await textToSpeech(stream, language, voiceName);
 
   console.log("TEXT: ", stream)
+
+  if(answer){
+   setAudioLoading(false)
+  }
   
   
 } catch (error) {
@@ -344,7 +371,6 @@ try {
 
   useEffect(() => {
     const handleRead = async () => {
-      setLoading(true);
     
       try {
         const response = await fetch("/api/read", {
@@ -361,16 +387,17 @@ try {
     
         const results = await response.json();
         if (response.ok) {
-          //console.log("SUCCESS: ", results); 
+          console.log("Tracks: ", results); 
           setLectures(results);
+          setTracks(results)
+          setRetrievedLectures(true)
+
         } else {
           console.error("Error reading data:", results.error);
         }
       } catch (error) {
         console.error("Error in handleRead:", error);
-      } finally {
-        setLoading(false);
-      }
+      } 
     };
     
     handleRead();
@@ -467,7 +494,8 @@ try {
 
 
 
-        {loading ? (
+        
+    {answerLoading && (
           <div className="mt-6 w-full">
               <>
                 <div className="font-bold text-2xl text-white">Answer</div>
@@ -479,7 +507,21 @@ try {
                   <div className="h-4 bg-gray-300 rounded mt-2"></div>
                 </div>
               </>
+          </div>
+        )}
 
+{audioLoading && (
+          <div className="mt-6 w-full">
+            <div className="font-bold text-2xl mt-6 text-white">Generated Audio Lecture</div>
+            <div className="animate-pulse mt-2">
+              <div className="h-4 bg-gray-300 rounded"></div>
+              <div className="h-4 bg-gray-300 rounded mt-2"></div>
+            </div>
+          </div>
+        )}
+
+    {sourcesLoading && (
+          <div className="mt-6 w-full">
             <div className="font-bold text-2xl mt-6 text-white">Sources</div>
             <div className="animate-pulse mt-2">
               <div className="h-4 bg-gray-300 rounded"></div>
@@ -489,56 +531,40 @@ try {
               <div className="h-4 bg-gray-300 rounded mt-2"></div>
             </div>
           </div>
-        ) : answer ? (
-          <div className="mt-6 text-white">
+        )} 
+
+{answer && (
+          <div className="mt-6 text-white my-3">
             <div className="font-bold text-2xl mb-2 text-white">Answer</div>
             <Answer text={answer} />
-
-            <div className="mt-6 mb-16 text-white">
-              <div className="font-bold text-2xl text-white">Sources</div>
-
-              {chunks.map((chunk, index) => (
-                <div key={index}>
-                  <div className="mt-4 border border-zinc-600 rounded-lg p-4 text-white">
-                    <div className="flex justify-between">
-                      <div>
-                        <div className="font-bold text-xl">{chunk.maintopic}</div>
-                        <div className="mt-1 font-bold text-sm">{chunk.dateadded}</div>
-                      </div>
-                      <a
-                        className="hover:opacity-50 ml-2"
-                        href={chunk.audiourl}
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        <IconExternalLink />
-                      </a>
-                    </div>
-                    <div className="mt-2">{chunk.transcription}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
             {audioUrl && (
-  <div className="flex justify-between">
-  <div>
-    <div className="font-bold text-xl">Title 1</div>
-    <div className="mt-1 font-bold text-sm">Title 2</div>
-  </div>
-  <a
-    className="hover:opacity-50 ml-2"
-    href={audioUrl}
-    target="_blank"
-    rel="noreferrer"
-  >
-    <IconExternalLink />
-  </a>
-</div>
+              <>
+              <div className="font-bold text-2xl mb-2 text-white">Generated Audio Lecture</div>
+                  <div className="flex items-center justify-between rounded-md bg-muted p-3 bg-white mt-6">
+                    <div className="flex items-center gap-3">
+                      <IconFileMusic className="w-6 h-6 text-gray-400" />
+                      <div>
+                        <h4 className="font-medium text-black">{query}</h4>
+                        <p className="text-sm text-muted-foreground text-black">{date}</p>
+                      </div>
+                    </div>
+                    <a
+                      className="hover:opacity-50 ml-2"
+                      href={audioUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                    <Button variant="ghost" size="icon">
+                      <IconPlayerPlay className="w-5 h-5 text-purple-600" />
+                    </Button>
+                    </a>
+                  </div>
+                  </>
 )}
-
           </div>
-        ) : chunks.length > 0 ? (
+        )} 
+
+{chunks.length > 0 && (
           <div className="mt-6 pb-16">
             <div className="font-bold text-2xl text-white">Sources</div>
             {chunks.map((chunk, index) => (
@@ -563,17 +589,19 @@ try {
               </div>
             ))}
           </div>
-        ) : (
+        )}
+
+{retrievedLectures && (
           <>
           <Link href='/record'>
             <div className="mt-6 text-center text-lg text-white">
-              {`Ask a question based on the lectures recorded and notes uploaded. when ready hold the record botton and ask your question, when done stop hold.`}
+              Ask a question based on the lectures recorded and notes uploaded. when ready hold the record botton and ask your question, when done stop hold.
             </div>
           </Link>
           <div className="flex w-full max-w-4xl gap-8 mt-8 flex-1">
           <div className="space-y-2">
           <h3 className="text-lg font-medium text-white">Lecture Audios</h3>
-            {lectures.map((lecture, index) => (
+          {lectures.map((lecture, index) => (
                   <div key={index} className="flex items-center justify-between rounded-md bg-muted p-3 bg-white ">
                     <div className="flex items-center gap-3">
                       <IconFileMusic className="w-6 h-6 text-gray-400" />
@@ -582,11 +610,20 @@ try {
                         <p className="text-sm text-muted-foreground">{lecture.dateadded}</p>
                       </div>
                     </div>
+                    <a
+                      className="hover:opacity-50 ml-2"
+                      href={lecture.audiourl}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
                     <Button variant="ghost" size="icon">
                       <IconPlayerPlay className="w-5 h-5 text-purple-600" />
                     </Button>
+                    </a>
                   </div>
                 ))}
+
+               
           </div>
         </div>
           </>

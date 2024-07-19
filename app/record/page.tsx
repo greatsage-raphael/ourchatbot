@@ -87,6 +87,7 @@ const RecordVoicePage = () => {
         console.log("Supabase Error:", error);
       } else {
         console.log("Saved", data);
+        router.push('/generate')
       }
 
         } catch (error) {
