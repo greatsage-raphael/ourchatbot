@@ -7,9 +7,6 @@ import { AutoSizer } from "react-virtualized";
 export default function MicFFT({
   fft,
   className,
-}: {
-  fft: number[];
-  className?: string;
 }) {
   return (
     <div className={"relative size-full"}>
