@@ -221,7 +221,7 @@ export default function Home() {
     try {
       setDate('')
       const formattedDate = getCurrentFormattedDate();
-      const response = await fetch('http://localhost:8000/synthesize', {
+      const response = await fetch('https://red-delight-414207.uc.r.appspot.com/synthesize', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
