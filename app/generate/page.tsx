@@ -569,22 +569,24 @@ try {
                     </a>
                   </div>
                   <div className="font-bold text-2xl mb-2 text-white">Quiz</div>
-                  <a
-                      className="hover:opacity-50 ml-2"
-                      href={`/quiz/${quizId}`}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                  <div className="flex items-center justify-between rounded-md bg-muted p-3 bg-white mt-6">
-                    <div className="flex items-center gap-3">
-                      <IconFileMusic className="w-6 h-6 text-gray-400" />
-                      <div>
-                        <h4 className="font-medium text-black">{query}</h4>
-                        <p className="text-sm text-muted-foreground text-black">{date}</p>
-                      </div>
-                    </div>
-                  </div>
-                  </a>
+                  {quizId && (
+          <a
+            className="hover:opacity-50 ml-2"
+            href={`/quiz/${quizId}`}
+            target="_blank"
+            rel="noreferrer"
+          >
+            <div className="flex items-center justify-between rounded-md bg-muted p-3 bg-white mt-6">
+              <div className="flex items-center gap-3">
+                <IconFileMusic className="w-6 h-6 text-gray-400" />
+                <div>
+                  <h4 className="font-medium text-black">{query}</h4>
+                  <p className="text-sm text-muted-foreground text-black">{date}</p>
+                </div>
+              </div>
+            </div>
+          </a>
+        )}
 
                   </>
 )}
