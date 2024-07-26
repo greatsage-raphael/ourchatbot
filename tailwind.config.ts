@@ -21,6 +21,6 @@ const config: Config = {
       },
     },
   },
-  plugins: [require('tailwindcss-animate')],
+  plugins: [require('tailwindcss-animate'), ('tailwindcss-textshadow')],
 };
 export default config;

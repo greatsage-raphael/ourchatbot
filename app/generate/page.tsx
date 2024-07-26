@@ -19,6 +19,7 @@ import { RecentQuizSets } from "@/components/ui/recentQuizzes";
 
 
 
+
 interface tracks {
   id: number;
   userid: string;
@@ -109,6 +110,7 @@ export default function Home() {
   const [sourcesLoading, setSourcesLoading] = useState<boolean>(false);
   const [answerLoading, setAnswerLoading] = useState<boolean>(false);
   const [audioLoading, setAudioLoading] = useState<boolean>(false);
+  const [quizLoading, setQuizLoading] = useState<boolean>(false);
   const [showSettings, setShowSettings] = useState<boolean>(false);
   const [podcastTime, setPodcastTime] = useState<number>(5);
   const [title, setTitle] = useState('Record your voice note');
@@ -253,10 +255,12 @@ export default function Home() {
     }
     setRetrievedLectures(false)
     setAnswer("");
+    setQuizId("")
     setChunks([]);
     setAnswerLoading(true);
     setSourcesLoading(true)
     setAudioLoading(true)
+    setQuizLoading(true)
 
     const searchResponse = await fetch("/api/search", {
       method: "POST",
@@ -330,7 +334,7 @@ for await (const chunk of answer.stream) {
 }
 
 try {
-  const answer = await textToSpeech(stream, language, voiceName);
+  const audio = await textToSpeech(stream, language, voiceName);
   const quizId = await generateAndSaveQuiz(stream, query)
 
 
@@ -338,9 +342,13 @@ try {
 
   console.log("TEXT: ", stream)
 
-  if(answer){
+  if(audio){
    setAudioLoading(false)
   }
+
+  if(quizId){
+    setQuizLoading(false)
+   }
   
   
 } catch (error) {
@@ -529,6 +537,15 @@ try {
           </div>
         )}
 
+{quizLoading && (
+          <div className="mt-6 w-full">
+            <div className="font-bold text-2xl mt-6 text-white">Quiz</div>
+            <div className="animate-pulse mt-2">
+              <div className="h-4 bg-gray-300 rounded mt-2"></div>
+            </div>
+          </div>
+        )}
+
     {sourcesLoading && (
           <div className="mt-6 w-full">
             <div className="font-bold text-2xl mt-6 text-white">Sources</div>
@@ -544,11 +561,11 @@ try {
 
 {answer && (
           <div className="mt-6 text-white my-3">
-            <div className="font-bold text-2xl mb-2 text-white">Answer</div>
+            <div className="font-bold text-2xl mb-2 text-white">Answer:</div>
             <Answer text={answer} />
             {audioUrl && (
               <>
-              <div className="font-bold text-2xl mb-2 text-white">Generated Audio Lecture</div>
+              <div className="font-bold text-2xl mb-2 text-white">Generated Audio Lecture:</div>
                   <div className="flex items-center justify-between rounded-md bg-muted p-3 bg-white mt-6">
                     <div className="flex items-center gap-3">
                       <IconFileMusic className="w-6 h-6 text-gray-400" />
@@ -568,28 +585,22 @@ try {
                     </Button>
                     </a>
                   </div>
-                  <div className="font-bold text-2xl mb-2 text-white">Quiz</div>
-                  {quizId && (
+                  </>
+)}
+    
+{quizId && (
+  <>
+  <div className="font-bold text-2xl mb-2 text-white">Quiz: </div>
           <a
             className="hover:opacity-50 ml-2"
             href={`/quiz/${quizId}`}
             target="_blank"
             rel="noreferrer"
           >
-            <div className="flex items-center justify-between rounded-md bg-muted p-3 bg-white mt-6">
-              <div className="flex items-center gap-3">
-                <IconFileMusic className="w-6 h-6 text-gray-400" />
-                <div>
-                  <h4 className="font-medium text-black">{query}</h4>
-                  <p className="text-sm text-muted-foreground text-black">{date}</p>
-                </div>
-              </div>
-            </div>
+            <Button className="button-92">Start: {query}</Button>
           </a>
+          </>
         )}
-
-                  </>
-)}
           </div>
         )} 
 

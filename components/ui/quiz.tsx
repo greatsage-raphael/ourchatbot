@@ -9,6 +9,7 @@ import type { Quiz as TQuiz } from "../../app/api/quiz/route";
 import { cn } from "../../utils/cn";
 import { Button } from "../ui/button";
 
+
 type QuizOptionProps = TQuiz["options"][number] & {
   answerIndex: number;
   submitted: boolean;
@@ -32,9 +33,9 @@ const QuizOption = ({
       value={index.toString()}
       disabled={submitted}
       className={cn(
-        "relative w-full block cursor-pointer rounded-lg border bg-white p-4 shadow-sm focus:outline-none sm:flex sm:justify-between  border-neutral-300 disabled:cursor-default",
+        "relative w-full block cursor-pointer rounded-lg border bg-white p-4 shadow-sm focus:outline-none sm:flex sm:justify-between border-neutral-300 disabled:cursor-default",
         !submitted
-          ? "data-[state=checked]:border-neutral-700 data-[state=checked]:ring-1 data-[state=checked]:ring-neutral-700 data-[state=checked]:bg-neutral-100"
+          ? "data-[state=checked]:border-slate-350 data-[state=checked]:ring-1 data-[state=checked]:ring-purple-500 data-[state=checked]:bg-purple-500"
           : isCorrect
           ? isChosen
             ? "border-green-500 ring-green-500 bg-green-50 ring-1"
