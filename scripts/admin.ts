@@ -38,9 +38,9 @@ export async function transcribeAudio(url: string): Promise<{ TranscriptionRepor
       }
     }
 
-    console.log('Data:', data);
-    console.log('Transcription:', TranscriptionReport);
-    console.log('Topic:', topic);
+    //console.log('Data:', data);
+    //console.log('Transcription:', TranscriptionReport);
+    //console.log('Topic:', topic);
     return { TranscriptionReport, topic };
   } catch (error) {
     console.error('Error transcribing audio:', error);
@@ -70,7 +70,7 @@ export async function textToSpeech(text: string): Promise< audioUrl | undefined>
 
     const audioBlob = await response.blob();
     const audioUrl = URL.createObjectURL(audioBlob);
-    console.log("AUDIOURL: ", audioUrl)
+    //console.log("AUDIOURL: ", audioUrl)
     return audioUrl
   } catch (error) {
     console.error('Error converting text to speech:', error);

@@ -12,8 +12,10 @@ import { getCurrentFormattedDate } from "@/lib/utils";
 import { v4 as uuidv4 } from 'uuid';
 import { Button } from "@/components/ui/button";
 import { GeminiGenerate } from "../../scripts/generate"
+import { generateAndSaveQuiz } from "../../scripts/quiz"
 import { Answer } from "@/components/ui/Answer/Answer";
 import { LanguageSelect } from "@/components/ui/languageSelect";
+import { RecentQuizSets } from "@/components/ui/recentQuizzes";
 
 
 
@@ -123,6 +125,7 @@ export default function Home() {
   const [voiceName, setVoiceName] = useState<string>(voiceNames["en-US"]);
   const [date, setDate] = useState("")
   const [retrievedLectures, setRetrievedLectures] = useState<boolean>(false)
+  const [quizId, setQuizId] = useState('');
   const { user } = useUser();
 
   //console.log("USER", user)
@@ -156,7 +159,7 @@ export default function Home() {
           const topic = transcriptionResult?.topic ?? "No Topic Detected";
 
           setQuery(transcription)
-          handleGeneration()
+          //handleGeneration()
 
           const model = genAI.getGenerativeModel({ model: "models/gemini-1.0-pro-latest"});
           const tokenCount = await model.countTokens(transcription)
@@ -217,6 +220,8 @@ export default function Home() {
       languageCode,
       voiceName,
     };
+
+  
 
     try {
       setDate('')
@@ -326,6 +331,10 @@ for await (const chunk of answer.stream) {
 
 try {
   const answer = await textToSpeech(stream, language, voiceName);
+  const quizId = await generateAndSaveQuiz(stream, query)
+
+
+  setQuizId(quizId)
 
   console.log("TEXT: ", stream)
 
@@ -559,6 +568,24 @@ try {
                     </Button>
                     </a>
                   </div>
+                  <div className="font-bold text-2xl mb-2 text-white">Quiz</div>
+                  <a
+                      className="hover:opacity-50 ml-2"
+                      href={`/quiz/${quizId}`}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                  <div className="flex items-center justify-between rounded-md bg-muted p-3 bg-white mt-6">
+                    <div className="flex items-center gap-3">
+                      <IconFileMusic className="w-6 h-6 text-gray-400" />
+                      <div>
+                        <h4 className="font-medium text-black">{query}</h4>
+                        <p className="text-sm text-muted-foreground text-black">{date}</p>
+                      </div>
+                    </div>
+                  </div>
+                  </a>
+
                   </>
 )}
           </div>
@@ -622,6 +649,8 @@ try {
                     </a>
                   </div>
                 ))}
+
+           
 
                
           </div>
