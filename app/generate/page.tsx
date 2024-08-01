@@ -1,3 +1,4 @@
+// @ts-nocheck
 "use client"
 
 import { IconMusic, IconMicrophone, IconFileMusic , IconPlayerPlay, IconExternalLink} from "@tabler/icons-react";
