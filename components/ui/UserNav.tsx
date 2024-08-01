@@ -1,6 +1,6 @@
 'use client';
 
-import { LogOut, Paintbrush2 } from 'lucide-react';
+import { LogOut, Paintbrush2, MicIcon, BotIcon } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from './avatar';
 import { Button } from './button';
 import {
@@ -47,10 +47,22 @@ export function UserNav({
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <Link href="/dashboard">
+        <Link href="/generate">
           <DropdownMenuItem className="hover:cursor-pointer hover:bg-gray-200">
             <Paintbrush2 className="mr-2 h-4 w-4 text-black" />
-            <span className="text-black">Dashboard</span>
+            <span className="text-black">Generate</span>
+          </DropdownMenuItem>
+        </Link>
+        <Link href="/record">
+          <DropdownMenuItem className="hover:cursor-pointer hover:bg-gray-200">
+            <MicIcon className="mr-2 h-4 w-4 text-black" />
+            <span className="text-black">Record</span>
+          </DropdownMenuItem>
+        </Link>
+        <Link href="/tutor">
+          <DropdownMenuItem className="hover:cursor-pointer hover:bg-gray-200">
+            <BotIcon className="mr-2 h-4 w-4 text-black" />
+            <span className="text-black">AI tutor</span>
           </DropdownMenuItem>
         </Link>
         <DropdownMenuItem

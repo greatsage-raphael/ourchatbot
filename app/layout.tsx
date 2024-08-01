@@ -5,6 +5,8 @@ import Footer from '@/components/ui/Footer';
 import Header from '@/components/ui/Header';
 import { Toaster } from 'react-hot-toast';
 import { Analytics } from '@vercel/analytics/react';
+import { DeepgramContextProvider } from "./context/DeepgramContextProvider";
+import { MicrophoneContextProvider } from "./context/MicrophoneContextProvider";
 
 let title = 'BlindCast - Take lecture notes with your phone';
 let description = 'BlindCast lets blind students turn audio lectures into an interactive podcast with the lectures as context. Uninterrupted grounded leraning';
@@ -45,11 +47,15 @@ export default function RootLayout({
     <html lang="en">
       <body className='flex flex-col min-h-screen bg-black'>
         <ClerkClientProvider>
+        <MicrophoneContextProvider>
+        <DeepgramContextProvider>
           <Header />
           {children}
           <Analytics />
           <Footer />
           <Toaster position="bottom-left" reverseOrder={false} />
+          </DeepgramContextProvider>
+          </MicrophoneContextProvider>
         </ClerkClientProvider>
       </body>
     </html>

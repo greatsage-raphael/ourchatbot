@@ -4,7 +4,7 @@ import { IconMusic, IconMicrophone, IconFileMusic , IconPlayerPlay, IconExternal
 import endent from "endent";
 import { ChangeEvent, KeyboardEvent, SVGProps, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { genAI, supabase, embedTranscription, transcribeAudio } from '@/scripts/admin';
+import { genAI, supabase, embedTranscription, transcribeAudio, fetchFlashcards } from '@/scripts/admin';
 import { useUser } from "@clerk/nextjs";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { storage } from "@/utils/firebaseConfig";
@@ -16,6 +16,8 @@ import { generateAndSaveQuiz } from "../../scripts/quiz"
 import { Answer } from "@/components/ui/Answer/Answer";
 import { LanguageSelect } from "@/components/ui/languageSelect";
 import { RecentQuizSets } from "@/components/ui/recentQuizzes";
+import ResultCard from "@/components/ui/webResult";
+import { FlashcardArray } from "react-quizlet-flashcard";
 
 
 
@@ -64,8 +66,16 @@ interface TavilySearchResult {
     url: string;
     content: string;
     raw_content?: string;
-    score: string;
+    score: number;
   }[];
+}
+
+interface webResult {
+  title: string;
+  url: string;
+  content: string;
+  score: number;
+  raw_content?: string;
 }
 
 const voiceNames: { [key: string]: string } = {
@@ -105,6 +115,8 @@ export default function Home() {
   const [query, setQuery] = useState<string>("");
   const [system, setSystem] = useState<string>("");
   const [chunks, setChunks] = useState<lecture[]>([]);
+  const [webResults, setWebResults] = useState<webResult[]>([]);
+  const [flashcards, setFlashcards] = useState([]);
   const [answer, setAnswer] = useState<string>("");
   const [response, setResponse] = useState<string>("");
   const [sourcesLoading, setSourcesLoading] = useState<boolean>(false);
@@ -132,8 +144,25 @@ export default function Home() {
 
   //console.log("USER", user)
 
+  // Convert Tailwind CSS classes to style objects
+  const primaryGradient = {
+    background: 'linear-gradient(267deg, #4402d2 -9.43%, #040218 -9.42%, rgba(63, 17, 100, 0.94) 4.63%, rgba(14, 14, 18, 0.82) 127.55%)',
+  };
   
-  
+  const primaryShadow = {
+    boxShadow: '0px 4px 4px 0px rgba(0, 0, 0, 0.25)',
+  }
+
+  const cardStyle = {
+    ...primaryGradient,
+    ...primaryShadow,
+    color: 'white',
+    borderColor: '#1F2937', // border-gray-800 equivalent
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    textAlign: 'center',
+  };
 
   async function startRecording() {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -257,6 +286,7 @@ export default function Home() {
     setAnswer("");
     setQuizId("")
     setChunks([]);
+    setFlashcards([]);
     setAnswerLoading(true);
     setSourcesLoading(true)
     setAudioLoading(true)
@@ -318,8 +348,12 @@ export default function Home() {
     const rawinternetSearchResults = await searchTavily();
 
     const internetSearchResults = JSON.stringify(rawinternetSearchResults);
+
+    if(rawinternetSearchResults)
+
+      setWebResults(rawinternetSearchResults.results)
     
-    //console.log("Internet Results :", internetSearchResults)
+    //console.log("Internet Results :", rawinternetSearchResults.results)
 
     const answer = await GeminiGenerate(DBsearchResults, internetSearchResults, query, language, podcastTime)
 
@@ -335,12 +369,17 @@ for await (const chunk of answer.stream) {
 
 try {
   const audio = await textToSpeech(stream, language, voiceName);
+  const generatedFlashcards = await fetchFlashcards(stream);
   const quizId = await generateAndSaveQuiz(stream, query)
+
+  console.log("FlashCards:", generatedFlashcards)
+
+  setFlashcards(generatedFlashcards);
 
 
   setQuizId(quizId)
 
-  console.log("TEXT: ", stream)
+  //console.log("TEXT: ", stream)
 
   if(audio){
    setAudioLoading(false)
@@ -404,7 +443,7 @@ try {
     
         const results = await response.json();
         if (response.ok) {
-          console.log("Tracks: ", results); 
+          //console.log("Tracks: ", results); 
           setLectures(results);
           setTracks(results)
           setRetrievedLectures(true)
@@ -426,7 +465,7 @@ try {
     <div className="flex-1 overflow-auto">
       <div className="mx-auto flex h-full w-full max-w-[750px] flex-col items-center px-3 pt-4 sm:pt-8">
         <button
-          className="mt-4 flex cursor-pointer items-center space-x-2 rounded-full border border-zinc-600 px-3 py-1 text-sm hover:opacity-50 text-white"
+          className="primary-gradient primary-shadow border-gray-800 mt-4 flex cursor-pointer items-center space-x-2 rounded-full border px-3 py-1 text-sm hover:opacity-50 text-white"
           onClick={() => setShowSettings(!showSettings)} >
           {showSettings ? "Hide" : "Show"} Settings
         </button>
@@ -498,12 +537,12 @@ try {
               </div>
               <div className="flex items-center gap-10 mb-6 ">
               <Button
-        className="cursor-pointer rounded-md bg-purple-500 px-4 py-2 font-bold text-white hover:bg-purple-600 active:bg-slate-700"
+        className="primary-gradient primary-shadow border-gray-800 cursor-pointer rounded-md px-4 py-2 font-bold text-white active:bg-slate-700"
         onClick={handleGeneration}>
         Generate
         </Button>
         <Button
-        className="cursor-pointer rounded-md bg-purple-500 px-4 py-2 font-bold text-white hover:bg-purple-600 active:bg-slate-700"
+        className="primary-gradient primary-shadow border-gray-800 cursor-pointer rounded-md px-4 py-2 font-bold text-white active:bg-slate-700"
         onClick={() => setQuery('')}>
          Clear
          </Button>
@@ -566,25 +605,26 @@ try {
             {audioUrl && (
               <>
               <div className="font-bold text-2xl mb-2 text-white">Generated Audio Lecture:</div>
-                  <div className="flex items-center justify-between rounded-md bg-muted p-3 bg-white mt-6">
-                    <div className="flex items-center gap-3">
-                      <IconFileMusic className="w-6 h-6 text-gray-400" />
-                      <div>
-                        <h4 className="font-medium text-black">{query}</h4>
-                        <p className="text-sm text-muted-foreground text-black">{date}</p>
-                      </div>
-                    </div>
-                    <a
+              <a
                       className="hover:opacity-50 ml-2"
                       href={audioUrl}
                       target="_blank"
                       rel="noreferrer"
                     >
+              
+                  <div className="primary-gradient primary-shadow border-gray-800 flex items-center justify-between rounded-md bg-muted p-3 bg-white mt-6">
+                    <div className="flex items-center gap-3">
+                      <IconFileMusic className="w-6 h-6 text-gray-400" />
+                      <div>
+                        <h4 className="font-medium text-white">{query}</h4>
+                        <p className="text-sm text-muted-foreground text-white">{date}</p>
+                      </div>
+                    </div>
                     <Button variant="ghost" size="icon">
                       <IconPlayerPlay className="w-5 h-5 text-purple-600" />
                     </Button>
-                    </a>
                   </div>
+                  </a>
                   </>
 )}
     
@@ -597,39 +637,78 @@ try {
             target="_blank"
             rel="noreferrer"
           >
-            <Button className="button-92">Start: {query}</Button>
+            <Button className="primary-gradient primary-shadow border-gray-800 animate-pulse h-16 w-26">Start: {query}</Button>
+            
           </a>
           </>
         )}
+
+
+<div className="flex justify-center items-center h-screen bg-gray-900">
+<FlashcardArray 
+        cards={flashcards} 
+        FlashcardArrayStyle={cardStyle}
+        controls={true}
+        frontCardStyle={cardStyle}
+        frontContentStyle={cardStyle}
+        backCardStyle={cardStyle}
+        backContentStyle={cardStyle}
+      />
+      <style>
+        {`
+          .flashcard-control-button {
+            color: white !important;
+          }
+        `}
+      </style>
+    </div>
+    
           </div>
         )} 
 
 {chunks.length > 0 && (
           <div className="mt-6 pb-16">
             <div className="font-bold text-2xl text-white">Sources</div>
+            <div className="font-bold text-1xl text-white m-3">Your Content:</div>
             {chunks.map((chunk, index) => (
               <div key={index}>
-                <div className="mt-4 border border-zinc-600 rounded-lg p-4 text-white">
-                  <div className="flex justify-between">
-                    <div>
-                      <div className="font-bold text-xl">{chunk.maintopic}</div>
-                      <div className="mt-1 font-bold text-sm">{chunk.dateadded}</div>
-                    </div>
-                    <a
+                <a
                       className="hover:opacity-50 ml-2"
                       href={chunk.audiourl}
                       target="_blank"
                       rel="noreferrer"
                     >
+                <div className="primary-gradient primary-shadow border-gray-800 mt-4 border border-zinc-600 rounded-lg p-4 text-white">
+                  <div className="flex justify-between">
+                    <div>
+                      <div className="font-bold text-xl">{chunk.maintopic}</div>
+                      <div className="mt-1 font-bold text-sm">{chunk.dateadded}</div>
+                    </div>
+                    
                       <IconExternalLink />
-                    </a>
+                    
                   </div>
                   <div className="mt-2">{chunk.transcription}</div>
                 </div>
+                </a>
               </div>
             ))}
           </div>
         )}
+
+
+{webResults && (
+  <>
+  <div>
+            {webResults.map((result, index) => (
+              <>
+              <div className="font-bold text-1xl text-white m-3">Web sources:</div>
+        <ResultCard key={index} result={result} />
+        </>
+      ))}
+    </div>
+  </> 
+)}
 
 {retrievedLectures && (
           <>
