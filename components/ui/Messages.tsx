@@ -50,12 +50,12 @@ const Messages = forwardRef<
                 >
                   <div
                     className={cn(
-                      "text-xs capitalize font-medium leading-none opacity-50 pt-4 px-3 text-white"
+                      "primary-shadow text-xs capitalize font-medium leading-none opacity-50 pt-4 px-3 text-white"
                     )}
                   >
                     {msg.message.role}
                   </div>
-                  <div className={"pb-3 px-3 text-white"}>{msg.message.content}</div>
+                  <div className={"primary-gradient primary-shadow border-gray-800 pb-3 px-3 text-white"}>{msg.message.content}</div>
                   <Expressions values={msg.models.prosody?.scores ?? {}} />
                 </motion.div>
               );

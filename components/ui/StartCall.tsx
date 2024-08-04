@@ -29,7 +29,7 @@ export default function StartCall() {
               }}
             >
               <Button
-                className={"z-50 flex items-center gap-1.5 color-white"}
+                className={"primary-gradient primary-shadow border-gray-800 z-50 flex items-center gap-1.5 color-white"}
                 onClick={() => {
                   connect()
                     .then(() => {})
@@ -44,7 +44,7 @@ export default function StartCall() {
                     stroke={"currentColor"}
                   />
                 </span>
-                <span className="text-white">Start Call</span>
+                <span className="text-white">Start Lecture</span>
               </Button>
             </motion.div>
           </AnimatePresence>

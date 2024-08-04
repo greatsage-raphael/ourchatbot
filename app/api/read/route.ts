@@ -32,12 +32,12 @@ export async function POST(req: Request) {
     const reqBody = await req.json();
     const { userid } = reqBody;
 
-    console.log("USERID BE", userid);
+    //console.log("USERID BE", userid);
 
     // Update the data
     const updatedData = await ReadData({ userid });
 
-    console.log("Data :", updatedData);
+    //console.log("Data :", updatedData);
 
     return NextResponse.json(updatedData);
   } catch (error) {

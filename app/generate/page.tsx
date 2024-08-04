@@ -1,4 +1,4 @@
-// @ts-nocheck
+
 "use client"
 
 import { IconMusic, IconMicrophone, IconFileMusic , IconPlayerPlay, IconExternalLink} from "@tabler/icons-react";
@@ -19,6 +19,8 @@ import { LanguageSelect } from "@/components/ui/languageSelect";
 import { RecentQuizSets } from "@/components/ui/recentQuizzes";
 import ResultCard from "@/components/ui/webResult";
 import { FlashcardArray } from "react-quizlet-flashcard";
+import copy from 'copy-to-clipboard';
+import { useToast } from "../../components/ui/useToast";
 
 
 
@@ -117,10 +119,11 @@ export default function Home() {
   const [system, setSystem] = useState<string>("");
   const [chunks, setChunks] = useState<lecture[]>([]);
   const [webResults, setWebResults] = useState<webResult[]>([]);
-  const [flashcards, setFlashcards] = useState([]);
+  const [flashCards, setFlashcards] = useState([]);
   const [answer, setAnswer] = useState<string>("");
   const [response, setResponse] = useState<string>("");
   const [sourcesLoading, setSourcesLoading] = useState<boolean>(false);
+  const [flashCardsLoading, setFlashcardsLoading] = useState<boolean>(false)
   const [answerLoading, setAnswerLoading] = useState<boolean>(false);
   const [audioLoading, setAudioLoading] = useState<boolean>(false);
   const [quizLoading, setQuizLoading] = useState<boolean>(false);
@@ -141,8 +144,10 @@ export default function Home() {
   const [date, setDate] = useState("")
   const [retrievedLectures, setRetrievedLectures] = useState<boolean>(false)
   const [quizId, setQuizId] = useState('');
+  const [copied, setCopied] = useState(false);
   const { user } = useUser();
 
+  const { toast } = useToast()
   //console.log("USER", user)
 
   // Convert Tailwind CSS classes to style objects
@@ -165,6 +170,13 @@ export default function Home() {
     textAlign: 'center',
   };
 
+  const handleClick = async () => {
+    await copy(`${window.location.origin}/quiz/${quizId}`);
+    setCopied(true);
+    toast({
+      description: "Quiz Link copied successfully",
+    });
+  };
   async function startRecording() {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     const recorder = new MediaRecorder(stream);
@@ -176,7 +188,7 @@ export default function Home() {
 
     recorder.onstop = async () => {
       const audioBlob = new Blob(audioChunks, { type: 'audio/mp3' });
-      console.log("AudioBlob: ", audioBlob);
+      //console.log("AudioBlob: ", audioBlob);
 
       const filename = `${uuidv4()}.mp3`;
       if (user) {
@@ -277,6 +289,27 @@ export default function Home() {
     }
   };
 
+  const getFlashCards = async (text: string) => {
+    setFlashcards([])
+    try{
+      const flashCards = await fetchFlashcards(text);
+      const transformedCards = flashCards.map((card: any) => ({
+        ...card,
+        frontCardStyle: cardStyle,
+        backCardStyle: cardStyle,
+        className: 'custom-card',
+      }));
+    
+      setFlashcards(transformedCards);
+
+    } catch(error){
+      console.error(error)
+      alert("an error occurred when generating flash cards")
+    }finally {
+      return true
+    }
+  }
+
 
   const handleGeneration = async () => {
     if (!query) {
@@ -287,11 +320,13 @@ export default function Home() {
     setAnswer("");
     setQuizId("")
     setChunks([]);
-    setFlashcards([]);
     setAnswerLoading(true);
     setSourcesLoading(true)
     setAudioLoading(true)
+    setFlashcardsLoading(true)
     setQuizLoading(true)
+    setCopied(false)
+    
 
     const searchResponse = await fetch("/api/search", {
       method: "POST",
@@ -370,29 +405,26 @@ for await (const chunk of answer.stream) {
 
 try {
   const audio = await textToSpeech(stream, language, voiceName);
-  const generatedFlashcards = await fetchFlashcards(stream);
-  const quizId = await generateAndSaveQuiz(stream, query)
-
-  console.log("FlashCards:", generatedFlashcards)
-
-  setFlashcards(generatedFlashcards);
-
-
-  setQuizId(quizId)
-
-  //console.log("TEXT: ", stream)
 
   if(audio){
-   setAudioLoading(false)
-  }
+    setAudioLoading(false)
+   }
+
+  const quizId = await generateAndSaveQuiz(stream, query)
 
   if(quizId){
+    setQuizId(quizId)
     setQuizLoading(false)
    }
-  
+
+  //  const flashCards = await getFlashCards(stream)
+
+  //  if(flashCards){
+  //    setFlashcardsLoading(false)
+  //  }
   
 } catch (error) {
-  console.error("Error generating audio URL: ", error);
+  console.error("Error generating media; ", error);
 }
   };
 
@@ -428,7 +460,6 @@ try {
 
   useEffect(() => {
     const handleRead = async () => {
-    
       try {
         const response = await fetch("/api/read", {
           method: "POST",
@@ -474,15 +505,6 @@ try {
         {showSettings && (
           <div className="w-[340px] sm:w-[400px]">
             <div className="mt-2">
-              <div className="text-white">Podcast Time</div>
-              <input
-                type="number"
-                min={1}
-                max={20}
-                value={podcastTime}
-                onChange={(e) => setPodcastTime(Number(e.target.value))}
-                className="max-w-[400px] block w-full rounded-md border border-gray-300 p-2 text-black shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 sm:text-sm"
-              />
             <div className="text-white">Language</div>
             <LanguageSelect
               language={language}
@@ -532,7 +554,7 @@ try {
                   onMouseUp={handleRecordMouseUp}
                   className="cursor-pointer" >
                       <IconMicrophone   
-                        className={`cursor-pointer absolute right-2 top-2.5 h-7 w-7 rounded-full bg-purple-500 p-1 hover:cursor-pointer hover:bg-purple-600 sm:right-3 sm:top-3 sm:h-10 sm:w-10 text-white ${isRecording ? "bg-red-500" : ""}`}/>
+                        className={`primary-gradient primary-shadow border-gray-800 cursor-pointer absolute right-2 top-2.5 h-7 w-7 rounded-full  p-1 hover:cursor-pointer hover:bg-purple-600 sm:right-3 sm:top-3 sm:h-10 sm:w-10 text-white ${isRecording ? "bg-red-500" : ""}`}/>
                 </button>
 
               </div>
@@ -586,6 +608,16 @@ try {
           </div>
         )}
 
+{/* {flashCardsLoading && (
+          <div className="mt-6 w-full">
+            <div className="font-bold text-2xl mt-6 text-white">FlashCards Loading: </div>
+            <div className="animate-pulse mt-2">
+              <div className="h-4 bg-gray-300 rounded"></div>
+              <div className="h-4 bg-gray-300 rounded mt-2"></div>
+            </div>
+          </div>
+        )} */}
+
     {sourcesLoading && (
           <div className="mt-6 w-full">
             <div className="font-bold text-2xl mt-6 text-white">Sources</div>
@@ -605,15 +637,14 @@ try {
             <Answer text={answer} />
             {audioUrl && (
               <>
-              <div className="font-bold text-2xl mb-2 text-white">Generated Audio Lecture:</div>
+              <div className="font-bold text-2xl mb-1 text-white mt-3">Generated Audio Lecture:</div>
               <a
                       className="hover:opacity-50 ml-2"
                       href={audioUrl}
                       target="_blank"
                       rel="noreferrer"
                     >
-              
-                  <div className="primary-gradient primary-shadow border-gray-800 flex items-center justify-between rounded-md bg-muted p-3 bg-white mt-6">
+                  <div className="primary-gradient primary-shadow border-gray-800 flex items-center justify-between rounded-md bg-muted p-3 bg-white mt-2">
                     <div className="flex items-center gap-3">
                       <IconFileMusic className="w-6 h-6 text-gray-400" />
                       <div>
@@ -626,47 +657,33 @@ try {
                     </Button>
                   </div>
                   </a>
-                  </>
-)}
+                  </> )}
     
 {quizId && (
   <>
-  <div className="font-bold text-2xl mb-2 text-white">Quiz: </div>
+  <div className="font-bold text-2xl mb-2 text-white mt-3">Quiz: </div>
           <a
             className="hover:opacity-50 ml-2"
             href={`/quiz/${quizId}`}
             target="_blank"
             rel="noreferrer"
           >
-            <Button className="primary-gradient primary-shadow border-gray-800 animate-pulse h-16 w-26">Start: {query}</Button>
-            
+            <Button className="primary-gradient primary-shadow border-gray-800 animate-pulse h-16 w-26 mx-3">
+              Start: {query}
+            </Button> 
           </a>
+           <a>
+            <Button className="primary-gradient primary-shadow border-gray-800 animate-pulse h-16 w-26" onClick={handleClick}>
+            {copied ? 'Copied!' : 'Copy Quiz Link'}
+            </Button>
+           </a>
           </>
         )}
 
 
-<div className="flex justify-center items-center h-screen bg-gray-900">
-<FlashcardArray 
-        cards={flashcards} 
-        FlashcardArrayStyle={cardStyle}
-        controls={true}
-        frontCardStyle={cardStyle}
-        frontContentStyle={cardStyle}
-        backCardStyle={cardStyle}
-        backContentStyle={cardStyle}
-      />
-      <style>
-        {`
-          .flashcard-control-button {
-            color: white !important;
-          }
-        `}
-      </style>
-    </div>
-    
-          </div>
-        )} 
 
+          </div>
+        )}
 {chunks.length > 0 && (
           <div className="mt-6 pb-16">
             <div className="font-bold text-2xl text-white">Sources</div>

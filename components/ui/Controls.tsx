@@ -60,7 +60,7 @@ export default function Controls() {
             </div>
 
             <Button
-              className={"flex items-center gap-1 text-white"}
+              className={"primary-gradient primary-shadow border-gray-800 flex items-center gap-1 text-white"}
               onClick={() => {
                 disconnect();
               }}
@@ -73,7 +73,7 @@ export default function Controls() {
                   stroke={"currentColor"}
                 />
               </span>
-              <span>End Call</span>
+              <span>End Lecture</span>
             </Button>
           </motion.div>
         ) : null}

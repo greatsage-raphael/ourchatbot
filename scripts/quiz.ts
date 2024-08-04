@@ -45,7 +45,7 @@ const model = genAI.getGenerativeModel({
 // Function to generate and save the quiz
 export async function generateAndSaveQuiz(lectureText: string, query: string) {
   try {
-
+console.log("QIUZ FUNC RUNNING")
     const lecture = `
   Based on the following lecture text, generate a quiz with questions, multiple-choice options, the correct answer index, and an explanation for each question:
   ${lectureText}

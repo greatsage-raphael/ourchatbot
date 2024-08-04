@@ -76,7 +76,45 @@ export async function textToSpeech(text: string): Promise< audioUrl | undefined>
 }
 
 
-export async function fetchFlashcards(text: string) {
+// export async function fetchFlashcards(text: string) {
+//   let model = genAI.getGenerativeModel({
+//     model: "gemini-1.5-pro",
+//     generationConfig: {
+//       responseMimeType: "application/json",
+//       responseSchema: {
+//         type: FunctionDeclarationSchemaType.ARRAY,
+//         items: {
+//           type: FunctionDeclarationSchemaType.OBJECT,
+//           properties: {
+//             id: { type: FunctionDeclarationSchemaType.NUMBER },
+//             frontHTML: { type: FunctionDeclarationSchemaType.STRING },
+//             backHTML: { type: FunctionDeclarationSchemaType.STRING }
+//           },
+//         },
+//       },
+//     }
+//   });
+
+//   const prompt = `
+//   Based on the following lecture text, generate flashcards with questions and answers.
+//   Each flashcard should have the following JSON structure:
+//   {
+//     "id": number, 
+//     "frontHTML": question, 
+//     "backHTML": answer
+//   }
+//   Lecture Text: ${text}
+//   `;
+
+  
+//   let result = await model.generateContent(prompt);
+//   console.log("FlahCards: ", result)
+//   return JSON.parse(result.response.text());
+// };
+
+
+export const fetchFlashcards = async (text: string) => {
+  console.log("FLASHCARDS ROLLING>>")
   let model = genAI.getGenerativeModel({
     model: "gemini-1.5-pro",
     generationConfig: {
@@ -87,27 +125,25 @@ export async function fetchFlashcards(text: string) {
           type: FunctionDeclarationSchemaType.OBJECT,
           properties: {
             id: { type: FunctionDeclarationSchemaType.NUMBER },
-            frontHTML: { type: FunctionDeclarationSchemaType.STRING },
-            backHTML: { type: FunctionDeclarationSchemaType.STRING }
+            front: { type: FunctionDeclarationSchemaType.STRING },
+            back: { type: FunctionDeclarationSchemaType.STRING }
           },
         },
       },
     }
   });
 
-  const prompt = `
-  Based on the following lecture text, generate flashcards with questions and answers.
+  let prompt = `Based on the following lecture text below, generate flashcards with questions and answers accrording to the structure below.
   Each flashcard should have the following JSON structure:
   {
     "id": number, 
-    "frontHTML": question, 
-    "backHTML": answer
+    "front": question, 
+    "back": answer
   }
-  Lecture Text: ${text}
-  `;
+    lectureText: ${text}`;
 
-  
   let result = await model.generateContent(prompt);
-  console.log("FlahCards: ", result)
-  return JSON.parse(result.response.text());
+  let response = JSON.parse(result.response.text());
+  console.log("FLAHCARDS:", response)
+  return response
 };

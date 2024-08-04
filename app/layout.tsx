@@ -8,9 +8,9 @@ import { Analytics } from '@vercel/analytics/react';
 import { DeepgramContextProvider } from "./context/DeepgramContextProvider";
 import { MicrophoneContextProvider } from "./context/MicrophoneContextProvider";
 
-let title = 'BlindCast - Take lecture notes with your phone';
-let description = 'BlindCast lets blind students turn audio lectures into an interactive podcast with the lectures as context. Uninterrupted grounded leraning';
-let url = 'https://blindcast.vercel.com';
+let title = 'NoteCast - Take lecture notes with your phone';
+let description = 'Uninterrupted grounded leraning with the power of Gemini';
+let url = 'https://note-cast.vercel.app/';
 let ogimage = '';
 let sitename = 'blindCast';
 

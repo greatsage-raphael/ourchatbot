@@ -43,7 +43,7 @@ export async function POST(req: Request) {
     // Update the data
     const fetchedData = await NotecastRPC({ userid, query });
 
-    console.log("Data from rpc :", fetchedData);
+    //console.log("Data from rpc :", fetchedData);
 
     //const chunks = JSON.stringify(fetchedData)
 

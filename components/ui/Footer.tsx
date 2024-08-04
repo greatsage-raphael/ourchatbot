@@ -6,14 +6,14 @@ export default function Footer() {
       <div className='text-white'>
         Made with{' '}
         <a
-          href=""
+          href="https://mwambazi-collins.vercel.app/"
           target="_blank"
           className="font-bold transition hover:text-white/50"
         >
           🎧 {' '}
         </a>
         <a
-          href=""
+          href="https://mwambazi-collins.vercel.app/"
           target="_blank"
           className="font-bold transition hover:text-white/50"
         >
@@ -21,7 +21,7 @@ export default function Footer() {
         </a>
         , ❤️ {' '}
         <a
-          href=""
+          href="https://mwambazi-collins.vercel.app/"
           target="_blank"
           className="font-bold transition hover:text-white/50"
         >
@@ -30,7 +30,7 @@ export default function Footer() {
       </div>
       <div className="flex space-x-4 pb-4 sm:pb-0">
         <Link
-          href="https://twitter.com/nutlope"
+          href="https://x.com/thesupremesage"
           className="group"
           aria-label="Twitter"
         >
@@ -42,7 +42,7 @@ export default function Footer() {
           </svg>
         </Link>
         <Link
-          href="https://github.com/nutlope/notesgpt"
+          href="https://github.com/greatsage-raphael"
           className="group"
           aria-label="GitHub"
         >
