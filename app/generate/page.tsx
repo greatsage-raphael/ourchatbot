@@ -151,24 +151,24 @@ export default function Home() {
   //console.log("USER", user)
 
   // Convert Tailwind CSS classes to style objects
-  const primaryGradient = {
-    background: 'linear-gradient(267deg, #4402d2 -9.43%, #040218 -9.42%, rgba(63, 17, 100, 0.94) 4.63%, rgba(14, 14, 18, 0.82) 127.55%)',
-  };
+  // const primaryGradient = {
+  //   background: 'linear-gradient(267deg, #4402d2 -9.43%, #040218 -9.42%, rgba(63, 17, 100, 0.94) 4.63%, rgba(14, 14, 18, 0.82) 127.55%)',
+  // };
   
-  const primaryShadow = {
-    boxShadow: '0px 4px 4px 0px rgba(0, 0, 0, 0.25)',
-  }
+  // const primaryShadow = {
+  //   boxShadow: '0px 4px 4px 0px rgba(0, 0, 0, 0.25)',
+  // }
 
-  const cardStyle = {
-    ...primaryGradient,
-    ...primaryShadow,
-    color: 'white',
-    borderColor: '#1F2937', // border-gray-800 equivalent
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    textAlign: 'center',
-  };
+  // const cardStyle = {
+  //   ...primaryGradient,
+  //   ...primaryShadow,
+  //   color: 'white',
+  //   borderColor: '#1F2937', // border-gray-800 equivalent
+  //   display: 'flex',
+  //   justifyContent: 'center',
+  //   alignItems: 'center',
+  //   textAlign: 'center',
+  // };
 
   const handleClick = async () => {
     await copy(`${window.location.origin}/quiz/${quizId}`);
@@ -293,14 +293,14 @@ export default function Home() {
     setFlashcards([])
     try{
       const flashCards = await fetchFlashcards(text);
-      const transformedCards = flashCards.map((card: any) => ({
-        ...card,
-        frontCardStyle: cardStyle,
-        backCardStyle: cardStyle,
-        className: 'custom-card',
-      }));
+      // const transformedCards = flashCards.map((card: any) => ({
+      //   ...card,
+      //   frontCardStyle: cardStyle,
+      //   backCardStyle: cardStyle,
+      //   className: 'custom-card',
+      // }));
     
-      setFlashcards(transformedCards);
+      setFlashcards(flashCards);
 
     } catch(error){
       console.error(error)
