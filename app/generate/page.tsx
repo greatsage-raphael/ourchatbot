@@ -1,11 +1,11 @@
 
 "use client"
 
-import { IconMusic, IconMicrophone, IconFileMusic , IconPlayerPlay, IconExternalLink} from "@tabler/icons-react";
+import { IconMusic, IconMicrophone, IconFileMusic , IconPlayerPlay, IconExternalLink, IconDownload} from "@tabler/icons-react";
 import endent from "endent";
 import { ChangeEvent, KeyboardEvent, SVGProps, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { genAI, supabase, embedTranscription, transcribeAudio, fetchFlashcards } from '@/scripts/admin';
+import { genAI, supabase, embedTranscription, transcribeAudio, dub } from '@/scripts/admin';
 import { useUser } from "@clerk/nextjs";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { storage } from "@/utils/firebaseConfig";
@@ -14,6 +14,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { Button } from "@/components/ui/button";
 import { GeminiGenerate } from "../../scripts/generate"
 import { generateAndSaveQuiz } from "../../scripts/quiz"
+import { fetchFlashcards } from "../../scripts/flashCards"
 import { Answer } from "@/components/ui/Answer/Answer";
 import { LanguageSelect } from "@/components/ui/languageSelect";
 import { RecentQuizSets } from "@/components/ui/recentQuizzes";
@@ -21,8 +22,6 @@ import ResultCard from "@/components/ui/webResult";
 import { FlashcardArray } from "react-quizlet-flashcard";
 import copy from 'copy-to-clipboard';
 import { useToast } from "../../components/ui/useToast";
-
-
 
 
 interface tracks {
@@ -81,6 +80,12 @@ interface webResult {
   raw_content?: string;
 }
 
+interface flashCard {
+  id: number;
+  question: string;
+  answer: string
+}
+
 const voiceNames: { [key: string]: string } = {
   "af-ZA": "af-ZA-Standard-A",
   "ar-XA": "ar-XA-Standard-A", 
@@ -119,7 +124,7 @@ export default function Home() {
   const [system, setSystem] = useState<string>("");
   const [chunks, setChunks] = useState<lecture[]>([]);
   const [webResults, setWebResults] = useState<webResult[]>([]);
-  const [flashCards, setFlashcards] = useState([]);
+  const [flashCards, setFlashcards] = useState<flashCard[] | null>(null);
   const [answer, setAnswer] = useState<string>("");
   const [response, setResponse] = useState<string>("");
   const [sourcesLoading, setSourcesLoading] = useState<boolean>(false);
@@ -143,6 +148,7 @@ export default function Home() {
   const [voiceName, setVoiceName] = useState<string>(voiceNames["en-US"]);
   const [date, setDate] = useState("")
   const [retrievedLectures, setRetrievedLectures] = useState<boolean>(false)
+  const [uploadStatus, setUploadStatus] = useState<string | null>(null);
   const [quizId, setQuizId] = useState('');
   const [copied, setCopied] = useState(false);
   const { user } = useUser();
@@ -150,28 +156,52 @@ export default function Home() {
   const { toast } = useToast()
   //console.log("USER", user)
 
-  // Convert Tailwind CSS classes to style objects
-  // const primaryGradient = {
-  //   background: 'linear-gradient(267deg, #4402d2 -9.43%, #040218 -9.42%, rgba(63, 17, 100, 0.94) 4.63%, rgba(14, 14, 18, 0.82) 127.55%)',
-  // };
+  //Convert Tailwind CSS classes to style objects
+  const primaryGradient = {
+    background: 'linear-gradient(267deg, #4402d2 -9.43%, #040218 -9.42%, rgba(63, 17, 100, 0.94) 4.63%, rgba(14, 14, 18, 0.82) 127.55%)',
+  };
   
-  // const primaryShadow = {
-  //   boxShadow: '0px 4px 4px 0px rgba(0, 0, 0, 0.25)',
-  // }
+  const primaryShadow = {
+    boxShadow: '0px 4px 4px 0px rgba(0, 0, 0, 0.25)',
+  }
 
-  // const cardStyle = {
-  //   ...primaryGradient,
-  //   ...primaryShadow,
-  //   color: 'white',
-  //   borderColor: '#1F2937', // border-gray-800 equivalent
-  //   display: 'flex',
-  //   justifyContent: 'center',
-  //   alignItems: 'center',
-  //   textAlign: 'center',
-  // };
+  const cardStyle = {
+    ...primaryGradient,
+    ...primaryShadow,
+    color: 'white',
+    borderColor: '#1F2937', // border-gray-800 equivalent
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    textAlign: 'center',
+  };
+
+  
 
   const handleClick = async () => {
-    await copy(`${window.location.origin}/quiz/${quizId}`);
+    const response = await fetch('/api/links', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ url: `${window.location.origin}/quiz/${quizId}` }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to create short link');
+    }
+
+    const data = await response.json();
+
+    console.log("LINK", data)
+
+    if (data.error) {
+      throw new Error(data.error);
+    }
+
+    const shortLink = data.shortLink
+    //console.log("RES", response)
+    await copy(shortLink);
     setCopied(true);
     toast({
       description: "Quiz Link copied successfully",
@@ -289,26 +319,25 @@ export default function Home() {
     }
   };
 
-  const getFlashCards = async (text: string) => {
-    setFlashcards([])
-    try{
-      const flashCards = await fetchFlashcards(text);
-      // const transformedCards = flashCards.map((card: any) => ({
-      //   ...card,
-      //   frontCardStyle: cardStyle,
-      //   backCardStyle: cardStyle,
-      //   className: 'custom-card',
-      // }));
+  // const getFlashCards = async (text: string) => {
+  //   try{
+  //     const flashCards = await fetchFlashcards(text);
+  //     const transformedCards = flashCards.map((card: any) => ({
+  //       ...card,
+  //       frontCardStyle: cardStyle,
+  //       backCardStyle: cardStyle,
+  //       className: 'custom-card',
+  //     }));
     
-      setFlashcards(flashCards);
+  //     setFlashcards(transformedCards);
 
-    } catch(error){
-      console.error(error)
-      alert("an error occurred when generating flash cards")
-    }finally {
-      return true
-    }
-  }
+  //   } catch(error){
+  //     console.error(error)
+  //     alert("an error occurred when generating flash cards")
+  //   }finally {
+  //     return true
+  //   }
+  // }
 
 
   const handleGeneration = async () => {
@@ -417,7 +446,15 @@ try {
     setQuizLoading(false)
    }
 
-  //  const flashCards = await getFlashCards(stream)
+  //  const flashCards = await fetchFlashcards(stream);
+  //     const transformedCards = flashCards.map((card: any) => ({
+  //       ...card,
+  //       frontCardStyle: cardStyle,
+  //       backCardStyle: cardStyle,
+  //       className: 'custom-card',
+  //     }));
+    
+  //     setFlashcards(transformedCards);
 
   //  if(flashCards){
   //    setFlashcardsLoading(false)
@@ -440,6 +477,7 @@ try {
   const handleClear = () => {
     localStorage.removeItem("PODCAST_TIME");
     setPodcastTime(5);
+    setUploadStatus(null)
   };
 
   useEffect(() => {
@@ -450,14 +488,9 @@ try {
     }
   }, [podcastTime]);
 
-  useEffect(() => {
-    const PG_MATCH_COUNT = localStorage.getItem("PG_MATCH_COUNT");
-    if (PG_MATCH_COUNT) {
-      setPodcastTime(parseInt(PG_MATCH_COUNT));
-    }
-    inputRef.current?.focus();
-  }, []);
-
+  
+  //it should depend o more than page load
+  // add the lectures to local storage too
   useEffect(() => {
     const handleRead = async () => {
       try {
@@ -489,7 +522,72 @@ try {
     };
     
     handleRead();
-  }, []);
+  }, [lectures]);
+
+  async function handleFileChange(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if(user){
+      const userId = user.id
+      const fileName = file.name
+
+    try {
+      let uploadRoute = '';
+
+      if (file.type === 'application/pdf' || file.type === 'text/plain') {
+        uploadRoute = 'https://red-delight-414207.uc.r.appspot.com/uploadPdfs';
+      } else if (file.type === 'image/png' || file.type === 'image/jpeg') {
+        uploadRoute = 'https://red-delight-414207.uc.r.appspot.com/uploadImage';
+      } else if (file.type.startsWith('audio/')) {
+        uploadRoute = 'https://red-delight-414207.uc.r.appspot.com/uploadAudio';
+      } else if (file.type.startsWith('video/')) {
+        uploadRoute = 'https://red-delight-414207.uc.r.appspot.com/uploadVideo';
+      } else {
+        throw new Error('Unsupported file type');
+      }
+
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('userId', userId);
+      formData.append('pdfName', fileName);
+
+      formData.forEach((value, key) => {
+        console.log(`${key}: ${value}`);
+      });
+
+      const response = await fetch(uploadRoute, {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (response.ok) {
+        setUploadStatus(`${file.name} uploaded successfully`);
+      } else {
+        setUploadStatus(`${file.name} unable to upload. Please try again later.`);
+      }
+    } catch (error) {
+      setUploadStatus('An error occurred during the upload');
+      console.error('An error occurred during the upload:', error);
+    }
+  }
+  }
+
+  async function handleTranscriptDownload(transcription: string, name: string) {
+    const blob = new Blob([transcription], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `${name}.txt`;
+  document.body.appendChild(link);
+  link.click();
+
+  // Clean up
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+  }
+
 
   return (
     <>
@@ -513,6 +611,24 @@ try {
               setVoiceName(voiceNames[value]);
               }}
             />
+
+<div className="mt-2">
+<div className="text-white">Add to knowledge Base:
+{uploadStatus && (
+        <p className="mt-2 text-sm text-gray-700">{uploadStatus}</p>
+      )}
+</div>
+<div className="text-gray-600 text-sm">pdfs, images, audio and video can all be uploded</div>
+<input
+  type="file"
+  className="w-60 bg-white border border-gray-400 rounded-lg shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm px-4 py-2 placeholder-gray-500 text-gray-900"
+  id="medicalImage"
+  accept="image/*,application/pdf,text/plain,audio/*,video/*"
+  onChange={handleFileChange}
+  required
+/>
+
+          </div>
 
            
             </div>
@@ -679,8 +795,11 @@ try {
            </a>
           </>
         )}
-
-
+        {/* {flashCards && (
+   <div>
+      <FlashcardArray cards={flashCards} />
+    </div>
+)} */}
 
           </div>
         )}
@@ -718,7 +837,8 @@ try {
 {webResults && (
   <>
   <div>
-            {webResults.map((result, index) => (
+            {
+            webResults.map((result, index) => (
               <>
               <div className="font-bold text-1xl text-white m-3">Web sources:</div>
         <ResultCard key={index} result={result} />
@@ -737,32 +857,36 @@ try {
           </Link>
           <div className="flex w-full max-w-4xl gap-8 mt-8 flex-1">
           <div className="space-y-2">
-          <h3 className="text-lg font-medium text-white">Lecture Audios</h3>
+          <h3 className="text-lg font-medium text-white">Knowledge Base: </h3>
           {lectures.map((lecture, index) => (
-                  <div key={index} className="flex items-center justify-between rounded-md bg-muted p-3 bg-white ">
+                  <div key={index} className="primary-gradient primary-shadow border-gray-800 flex items-center justify-between rounded-md bg-muted p-3 bg-white ">
                     <div className="flex items-center gap-3">
-                      <IconFileMusic className="w-6 h-6 text-gray-400" />
+                      <IconFileMusic className="w-6 h-6 text-white-400" />
                       <div>
-                        <h4 className="font-medium">{lecture.maintopic}</h4>
-                        <p className="text-sm text-muted-foreground">{lecture.dateadded}</p>
+                        <h4 className="font-medium text-white ">{lecture.maintopic}</h4>
+                        <p className="text-sm text-muted-foreground text-white">{lecture.dateadded}</p>
                       </div>
                     </div>
-                    <a
-                      className="hover:opacity-50 ml-2"
-                      href={lecture.audiourl}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                    <Button variant="ghost" size="icon">
-                      <IconPlayerPlay className="w-5 h-5 text-purple-600" />
-                    </Button>
-                    </a>
+                    <div>
+                    <Link
+            href={lecture.audiourl}
+            className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/80 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2"
+          >
+            View Media
+            <IconExternalLink className="w-5 h-5" />
+          </Link>
+                    <div>
+                    <button
+      onClick={() => handleTranscriptDownload(lecture.transcription, lecture.maintopic)}
+      className="mt-3 inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/80 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2"
+    >
+      Download Transcript
+      <IconDownload className="w-5 h-5" />
+    </button>
+                    </div>
+                  </div>
                   </div>
                 ))}
-
-           
-
-               
           </div>
         </div>
           </>

@@ -37,6 +37,12 @@ export default async function Header() {
                 Generate
               </Link>
               <Link
+                href={'/tests'}
+                className="hidden cursor-pointer text-lg text-dark md:inline-block lg:text-xl"
+              >
+                Generations
+              </Link>
+              <Link
                 href={'/tutor'}
                 className="hidden cursor-pointer text-lg text-dark md:inline-block lg:text-xl"
               >

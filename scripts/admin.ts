@@ -1,17 +1,47 @@
-import { GoogleGenerativeAI, FunctionDeclarationSchemaType } from "@google/generative-ai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { createClient } from '@supabase/supabase-js'
+import { Dub } from "dub";
+
+export const dub = new Dub({
+  token: "dub_KCjZvBlxfChYAuihJtELuv2Z", // optional, defaults to DUB_API_KEY env variable
+});
 
 export const genAI = new GoogleGenerativeAI("AIzaSyCCnrDaiXhJY6PwrH_RVM9N7hT6uhRzpAw");
 
 export const supabase = createClient("https://eifeyuvbxmsjjtbtbyuk.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVpZmV5dXZieG1zamp0YnRieXVrIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY3ODc4NjY0NywiZXhwIjoxOTk0MzYyNjQ3fQ.LnuFgfty7CPOwWWor9c5E4oiNNIF_fTAh7KROU3_wHA");
 
+function splitContentIntoChunks(content: string, maxSize: number) {
+  const chunks = [];
+  let startIndex = 0;
+
+  while (startIndex < content.length) {
+      let endIndex = startIndex + maxSize;
+
+      if (endIndex > content.length) {
+          endIndex = content.length;
+      }
+
+      chunks.push(content.slice(startIndex, endIndex));
+      startIndex = endIndex;
+  }
+
+  return chunks;
+}
+
 export async function embedTranscription(transcription: string) {
   //Measuring the relatedness of text strings
-    const model = genAI.getGenerativeModel({ model: "embedding-001"});
-    const result = await model.embedContent(transcription);
-    const embedding = result.embedding;
-    //console.log("VECTORS:", embedding.values);
-    return embedding.values
+  const MAX_PAYLOAD_SIZE = 10000;
+  //Measuring the relatedness of text strings
+  const contentChunks = splitContentIntoChunks(transcription, MAX_PAYLOAD_SIZE);
+    let allEmbeddings = [];
+
+    for (const chunk of contentChunks) {
+        const model = genAI.getGenerativeModel({ model: "embedding-001" });
+        const result = await model.embedContent(chunk);
+        const embedding = result.embedding;
+        allEmbeddings.push(...embedding.values);
+    }
+    return allEmbeddings;
 }
 
 export async function transcribeAudio(url: string): Promise<{ TranscriptionReport: string; topic: string | null } | undefined> {
@@ -74,76 +104,3 @@ export async function textToSpeech(text: string): Promise< audioUrl | undefined>
     console.error('Error converting text to speech:', error);
   }
 }
-
-
-// export async function fetchFlashcards(text: string) {
-//   let model = genAI.getGenerativeModel({
-//     model: "gemini-1.5-pro",
-//     generationConfig: {
-//       responseMimeType: "application/json",
-//       responseSchema: {
-//         type: FunctionDeclarationSchemaType.ARRAY,
-//         items: {
-//           type: FunctionDeclarationSchemaType.OBJECT,
-//           properties: {
-//             id: { type: FunctionDeclarationSchemaType.NUMBER },
-//             frontHTML: { type: FunctionDeclarationSchemaType.STRING },
-//             backHTML: { type: FunctionDeclarationSchemaType.STRING }
-//           },
-//         },
-//       },
-//     }
-//   });
-
-//   const prompt = `
-//   Based on the following lecture text, generate flashcards with questions and answers.
-//   Each flashcard should have the following JSON structure:
-//   {
-//     "id": number, 
-//     "frontHTML": question, 
-//     "backHTML": answer
-//   }
-//   Lecture Text: ${text}
-//   `;
-
-  
-//   let result = await model.generateContent(prompt);
-//   console.log("FlahCards: ", result)
-//   return JSON.parse(result.response.text());
-// };
-
-
-export const fetchFlashcards = async (text: string) => {
-  console.log("FLASHCARDS ROLLING>>")
-  let model = genAI.getGenerativeModel({
-    model: "gemini-1.5-pro",
-    generationConfig: {
-      responseMimeType: "application/json",
-      responseSchema: {
-        type: FunctionDeclarationSchemaType.ARRAY,
-        items: {
-          type: FunctionDeclarationSchemaType.OBJECT,
-          properties: {
-            id: { type: FunctionDeclarationSchemaType.NUMBER },
-            front: { type: FunctionDeclarationSchemaType.STRING },
-            back: { type: FunctionDeclarationSchemaType.STRING }
-          },
-        },
-      },
-    }
-  });
-
-  let prompt = `Based on the following lecture text below, generate flashcards with questions and answers accrording to the structure below.
-  Each flashcard should have the following JSON structure:
-  {
-    "id": number, 
-    "front": question, 
-    "back": answer
-  }
-    lectureText: ${text}`;
-
-  let result = await model.generateContent(prompt);
-  let response = JSON.parse(result.response.text());
-  console.log("FLAHCARDS:", response)
-  return response
-};

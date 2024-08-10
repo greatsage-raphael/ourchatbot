@@ -5,11 +5,7 @@ import Messages from "./Messages";
 import Controls from "./Controls";
 import StartCall from "./StartCall";
 import { ComponentRef, useRef } from "react";
-import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { firestore, storage } from '../../utils/firebaseConfig';
-import { v4 as uuidv4 } from 'uuid';
-import { FieldValue, addDoc, arrayUnion, collection, doc, setDoc } from 'firebase/firestore';
-import { genAI } from '@/scripts/admin';
+import { useUser } from "@clerk/nextjs";
 
 
 
@@ -18,60 +14,47 @@ const handleToolCall: ToolCallHandler = async (
 ): Promise<ToolResponse | ToolError> => {
   console.log("Tool call received", toolCall);
 
-  if (toolCall.name === 'weather_tool') {
+  if (toolCall.name === 'get_notes_tool') {
     try {
       const args = JSON.parse(toolCall.parameters) as {
-        location: string;
-        format: 'fahrenheit' | 'celsius';
+        query: string;
       };
 
-      const location = await fetch(
-        `https://geocode.maps.co/search?q=${args.location}&api_key=${process.env.NEXT_PUBLIC_GEOCODING_API_KEY}`,
-      );
+      const { user } = useUser();
 
-      const locationResults = (await location.json()) as {
-        lat: string;
-        lon: string;
-      }[];
+      const query = args.query
 
-      const { lat, lon } = locationResults[0];
-
-      const pointMetadataEndpoint: string = `https://api.weather.gov/points/${parseFloat(lat).toFixed(3)},${parseFloat(lon).toFixed(3)}`;
-
-      const result = await fetch(pointMetadataEndpoint, {
-        method: 'GET',
+      const searchResponse = await fetch("/api/search", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ query, userid: user?.id })
       });
-
-      const json = (await result.json()) as {
-        properties: {
-          forecast: string;
-        };
-      };
-      const { properties } = json;
-      const { forecast: forecastUrl } = properties;
-
-      const forecastResult = await fetch(forecastUrl);
-
-      const forecastJson = (await forecastResult.json()) as {
-        properties: {
-          periods: unknown[];
-        };
-      };
-      const forecast = forecastJson.properties.periods;
+  
+  
+      if (!searchResponse.ok) {
+        throw new Error(searchResponse.statusText);
+      }
+  
+      const results = await searchResponse.json();
+  
+      const DBsearchResults = results?.map((d: any) => d.content).join("\n\n")
 
       return {
         type: 'tool_response',
         tool_call_id: toolCall.tool_call_id,
-        content: JSON.stringify(forecast),
+        content: JSON.stringify(DBsearchResults),
       };
+  
     } catch (error) {
       return {
         type: 'tool_error',
         tool_call_id: toolCall.tool_call_id,
-        error: 'Weather tool error',
-        code: 'weather_tool_error',
+        error: 'Notes Tool error',
+        code: 'notes_tool_error',
         level: 'warn',
-        content: 'There was an error with the weather tool',
+        content: 'There was an error with the notes tool',
       };
     }
   } 

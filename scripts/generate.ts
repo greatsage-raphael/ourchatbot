@@ -49,7 +49,7 @@ const createPrompt = (
 
 - Combine the information from the audio transcriptions and internet search results to create a coherent and informative lecture.
 - If audio transcriptions are insufficient or unavailable, rely more heavily on the internet search results.
--Avoid using special characters like #, $ , ^. Only use aplhabetic chjaracters because this text will be made into speech
+-Avoid using special characters like #, $ , ^. Only use aplhabetic characters because this text will be made into speech
 - Avoid using jargon and ensure the language is easy to understand.
 - Maintain a logical flow and structure, starting with an introduction, followed by the main content, and concluding with a summary or key takeaways.
 - Ensure the lecture is engaging and educational, suitable for an audience that is interested in the topic but may not have specialized knowledge.

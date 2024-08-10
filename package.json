@@ -32,6 +32,7 @@
     "convex-helpers": "^0.1.15",
     "copy-to-clipboard": "^3.3.3",
     "cors": "^2.8.5",
+    "dub": "^0.35.0",
     "endent": "^2.1.0",
     "firebase": "^10.12.2",
     "framer-motion": "^11.2.10",
