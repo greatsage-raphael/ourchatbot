@@ -40,7 +40,7 @@ export default async function Header() {
                 href={'/tests'}
                 className="hidden cursor-pointer text-lg text-dark md:inline-block lg:text-xl"
               >
-                Generations
+                Community
               </Link>
               <Link
                 href={'/tutor'}

@@ -34,7 +34,7 @@ const Divider = () => (
       <div className="primary-gradient primary-shadow border-gray-800 w-full border-t border-neutral-300" />
     </div>
     <div className="relative flex justify-center">
-      <span className="primary-gradient primary-shadow border-gray-800 px-4 text-sm text-neutral-500">Generations</span>
+      <span className="primary-gradient primary-shadow border-gray-800 px-4 text-sm text-neutral-500">Recent Generations</span>
     </div>
   </div>
 );

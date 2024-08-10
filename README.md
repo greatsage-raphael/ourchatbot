@@ -1,26 +1,14 @@
-<a href="https://usenotesgpt.com/">
-  <img alt="NotesGPT – AI-powered voice note taking in seconds." src="/public/images/og-image.png">
-  <h1 align="center">notesGPT</h1>
-</a>
-
 <p align="center">
-  Generate action items from your notes in seconds. Powered by Convex, Together.ai, and Whisper.
+  Generate notes, quizzes and talk with an interactive ai lecturer from your notes
 </p>
-
-<p align="center">
-  <a href="#tech-stack"><strong>Tech Stack</strong></a> ·
-  <a href="#deploy-your-own"><strong>Deploy Your Own</strong></a> ·
-  <a href="#future-tasks"><strong>Future Tasks</strong></a>
-</p>
-<br/>
 
 ## Tech Stack
 
-- [Gemini API](https://convex.dev/) for the generating embeddings and generating lecture text
+- [Gemini API](https://ai.google.dev/gemini-api/docs/models/gemini) for generating embeddings, generating lecture text, quizzes and processing audio, video into text
 - Next.js [App Router](https://nextjs.org/docs/app) for the framework
-- [Deepgram](https://dub.sh/together-ai) for STT and TTS 
-- [Firebase storage](https://dub.sh/together-ai) for file storage
-- [Supabase](https://docs.convex.dev/file-storage) for database including embedding storage
+- [Deepgram](https://deepgram.com/) for STT and TTS 
+- [Firebase storage](https://firebase.google.com/docs/firestore) for file storage of txt, audio, video
+- [Supabase](https://supabase.com/) for database including embedding storage
 - [Tailwind CSS](https://tailwindcss.com/) for styling
 
 ## Deploy Your Own

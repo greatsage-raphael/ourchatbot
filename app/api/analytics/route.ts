@@ -4,6 +4,7 @@ import { NextResponse } from 'next/server';
 import type { NextApiRequest, NextApiResponse } from "next";
 
 type Data = any;
+const analyticsUrls: string[] = [];
 
 interface ExtendedNextApiRequest extends NextApiRequest {
   body: {
