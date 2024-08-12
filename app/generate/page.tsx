@@ -179,29 +179,29 @@ export default function Home() {
   
 
   const handleClick = async () => {
-    const response = await fetch('/api/links', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ url: `${window.location.origin}/quiz/${quizId}` }),
-    });
+    // const response = await fetch('/api/links', {
+    //   method: 'POST',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //   },
+    //   body: JSON.stringify({ url: `${window.location.origin}/quiz/${quizId}` }),
+    // });
 
-    if (!response.ok) {
-      throw new Error('Failed to create short link');
-    }
+    // if (!response.ok) {
+    //   throw new Error('Failed to create short link');
+    // }
 
-    const data = await response.json();
+    // const data = await response.json();
 
-    console.log("LINK", data)
+    // console.log("LINK", data)
 
-    if (data.error) {
-      throw new Error(data.error);
-    }
+    // if (data.error) {
+    //   throw new Error(data.error);
+    // }
 
-    const shortLink = data.shortLink
+    // const shortLink = data.shortLink
     //console.log("RES", response)
-    await copy(shortLink);
+    await copy(`${window.location.origin}/quiz/${quizId}` );
     setCopied(true);
     toast({
       description: "Quiz Link copied successfully",
