@@ -9,7 +9,7 @@ export default function ClerkClientProvider({
 }) {
   return (
     <ClerkProvider
-      publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY!}
+      publishableKey={"pk_test_Y29tcGxldGUtY3JhYi0yOS5jbGVyay5hY2NvdW50cy5kZXYk"!}
     >
         {children}
     </ClerkProvider>
