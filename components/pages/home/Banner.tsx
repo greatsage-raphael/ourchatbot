@@ -10,17 +10,16 @@ const Banner = () => {
           rel="noreferrer"
           className="mb-5 cursor-pointer rounded-2xl border border-black px-4 py-1 text-sm text-slate-600 transition duration-300 ease-in-out hover:text-slate-700 sm:text-base"
         >
-          Powered by <span className="font-bold">Google Gemini </span>and{' '}
-          <span className="font-bold">Hume</span>
+          Powered by <span className="font-bold">Google Gemini </span>
         </a>
-        <h1 className="inline-block text-center text-4xl font-medium tracking-tighter text-dark lg:text-7xl">
-          Create Your Own AI tutor <br className="hidden lg:inline-block" />
-          from your lecture notes 
+        <h1 className="inline-block text-center text-2xl font-medium tracking-tighter text-dark lg:text-7xl">
+          Create Your Own 24/7 Customer Support chatbot <br className="hidden lg:inline-block" />
+          by pasting your website link
         </h1>
         <p className="mt-8 text-center text-xl font-light tracking-tight lg:text-3xl text-dark">
-          Upload your lecture notes or record your lectures an speak with your own {' '}
+          Paste your website link, select you preferred language and create a chatbot tailored to your {' '}
           <span className="font-bold">
-            AI Tutor <br className="hidden lg:inline-block" />
+            Bussiness <br className="hidden lg:inline-block" />
           </span>{' '}
            using {' '} <span className="font-bold">
             Gemini AI <br className="hidden lg:inline-block" />

@@ -5,14 +5,13 @@ import Footer from '@/components/ui/Footer';
 import Header from '@/components/ui/Header';
 import { Toaster } from 'react-hot-toast';
 import { Analytics } from '@vercel/analytics/react';
-import { DeepgramContextProvider } from "./context/DeepgramContextProvider";
-import { MicrophoneContextProvider } from "./context/MicrophoneContextProvider";
 
-let title = 'NoteCast - Take lecture notes with your phone';
-let description = 'Uninterrupted grounded leraning with the power of Gemini';
+
+let title = 'OurChatBot - Create a Chatbot with a link';
+let description = 'Create a chatbot with the power of Gemini';
 let url = 'https://note-cast.vercel.app/';
 let ogimage = '';
-let sitename = 'blindCast';
+let sitename = 'ourchatbot';
 
 export const metadata: Metadata = {
   metadataBase: new URL(url),
@@ -45,17 +44,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className='flex flex-col min-h-screen bg-black'>
+      <body className='flex flex-col min-h-screen bg-gray-100'>
         <ClerkClientProvider>
-        <MicrophoneContextProvider>
-        <DeepgramContextProvider>
           <Header />
           {children}
           <Analytics />
           <Footer />
           <Toaster position="bottom-left" reverseOrder={false} />
-          </DeepgramContextProvider>
-          </MicrophoneContextProvider>
         </ClerkClientProvider>
       </body>
     </html>

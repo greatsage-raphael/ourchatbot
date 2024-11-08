@@ -2,88 +2,46 @@ import { genAI } from '@/scripts/admin';
 import endent from 'endent';
 
 
-//Based on the average speed of speech, there are 150 words in a 1 minute speech.
-const wordsPerMinute = 150;
-
-
 const createPrompt = (
-    DbSearchResults: string,
-    InternetSearchResults: string,
-    query: string,
-    language: string,
-    time: number
+  allTextContent: string,
+  language: string
   ) => {
-    const wordCount = Math.round(time * wordsPerMinute);
-
-    // Sentences are usually between 15–20 words
-    const numberOfSentences = Math.round(wordCount / 15);
-
-    const maxSentencesPerParagraph = 5;
-
-    const numberOfParagraphs = Math.round(numberOfSentences / maxSentencesPerParagraph);
-
-
+    
       return endent`
--Avoid using special characters like #, $ , ^. Only use aplhabetic chjaracters because this text will be made into speech
-        You are an expert in generating lectures based on a given topic, audio transcriptions of lectures, and internet search results. Your task is to create a lecture that adheres to the following guidelines:
+Using the following raw text content from a website, generate a detailed and engaging 'About' section in ${language}. The section should clearly introduce the company, its mission, core values, and any unique products or services it offers. Summarize what sets the company apart in its industry, focusing on its commitment to quality, customer focus, and any notable achievements. The tone should be professional, warm, and inviting.
 
-1. **Topic**: ${query}
-2. **Language**: ${language}
-3. **Length**: Approximately ${wordCount} words (based on a speaking rate of 150 words per minute, for ${time} minutes).
-4. **Structure**: The lecture should consist of ${numberOfParagraphs} paragraphs, with each paragraph containing no more than ${maxSentencesPerParagraph} sentences. Each paragraph should cover a specific aspect of the topic as outlined below.
-
-### Instructions:
-
-1. **Introduction**:
-   - Paragraph 1: Introduce the topic, providing an overview and its relevance.
-   
-2. **Main Content**:
-   - Paragraph 2: Discuss the key points derived from the audio transcriptions.
-   - Paragraph 3: Elaborate on additional insights from the internet search results.
-   - Paragraph 4: Integrate both sources to provide a comprehensive understanding of the topic.
-   
-3. **Conclusion**:
-   - Paragraph 5: Summarize the main points and highlight the key takeaways.
-
-### Guidelines:
-
-- Combine the information from the audio transcriptions and internet search results to create a coherent and informative lecture.
-- If audio transcriptions are insufficient or unavailable, rely more heavily on the internet search results.
--Avoid using special characters like #, $ , ^. Only use aplhabetic characters because this text will be made into speech
-- Avoid using jargon and ensure the language is easy to understand.
-- Maintain a logical flow and structure, starting with an introduction, followed by the main content, and concluding with a summary or key takeaways.
-- Ensure the lecture is engaging and educational, suitable for an audience that is interested in the topic but may not have specialized knowledge.
-
-### Reference Materials:
-
-## Audio Transcriptions:
-${DbSearchResults}
-
-## Internet Search Results:
-${InternetSearchResults}
-
+Content: ${allTextContent}
      `;
   }
 
-export const GeminiGenerate = async (
-    DbSearchResults: string,
-    InternetSearchResults: string,
-    query: string,
-    language: string,
-    time: number
+export const GeminiGenerateAbout = async (
+  allTextContent: string,
+  language: string
 ) => {
   // Set the system instruction during model initialization
       const model = genAI.getGenerativeModel(
         { 
           model: "gemini-1.5-flash",
-          systemInstruction: "When answering do not under any circumstance use any special character like @, #, $, *. This answer is going to be made into an audio. under no circumstances are you to generate any such sign. you must not forget. you must not forget. You are an expert in generating lectures when given the language, the topic to discuss, audio transcriptions of lectures and internet search results. In the event that no audio transcripts are available use the internet search to generate the lecture. Avoid use of jargon when explaining concepts. stick to easy to understand language. Avoid using special signs like #, $, & as generated answers will be made into speech.",
+          systemInstruction: 
+        `
+          You are a content generation assistant skilled in crafting professional and inviting 'About' sections for websites. Given raw website text, your task is to produce a structured 'About' section that includes the following elements:
+          Introduction: Briefly introduce the company, its main focus, and core industry.
+          Mission: Summarize the company’s mission and how it aims to impact customers or the broader community.
+          Values: List and explain any core values or principles that drive the company.
+          Products/Services: Describe the primary products or services offered, focusing on what makes them unique or valuable.
+          Competitive Edge: Highlight any notable strengths, achievements, or qualities that set the company apart in the industry.
+          Engagement Style: Use a tone that is professional yet warm, appealing to a broad audience of potential customers and partners.
+          Every 'About' section should be detailed yet concise, making the company appear reputable, customer-focused, and dedicated to quality. Your response should be in complete sentences and free of jargon, presenting the company’s story as clearly as possible.
+          You will receive the full text content of a website to use as reference material in crafting your response. Only information explicitly present in the text should be used 
+        `
         });
 
-  const prompt = createPrompt( DbSearchResults, InternetSearchResults, query, language, time);
+  const prompt = createPrompt(allTextContent, language);
 
   const result = await model.generateContentStream([prompt]);
 
-  //console.log("Stream", result)
+  console.log("Results", result)
+
 
   return result
 }

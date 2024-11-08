@@ -59,6 +59,12 @@ export function UserNav({
             <span className="text-black">Record</span>
           </DropdownMenuItem>
         </Link>
+        <Link href="/tests">
+          <DropdownMenuItem className="hover:cursor-pointer hover:bg-gray-200">
+          <Paintbrush2 className="mr-2 h-4 w-4 text-black" />
+            <span className="text-black">Community</span>
+          </DropdownMenuItem>
+        </Link>
         <Link href="/tutor">
           <DropdownMenuItem className="hover:cursor-pointer hover:bg-gray-200">
             <BotIcon className="mr-2 h-4 w-4 text-black" />
