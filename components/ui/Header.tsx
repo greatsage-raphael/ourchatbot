@@ -10,6 +10,9 @@ export default async function Header() {
       <div className="max-width flex items-center justify-between text-white">
         {/* logo */}
         <Link className="flex w-fit items-center gap-[2px]" href="/">
+          <h1 className="text-xl font-medium text-[#25292F] md:text-3xl">
+          OurChatBot 
+          </h1>
           <img
             src="/logo.svg"
             width={50}
@@ -17,9 +20,6 @@ export default async function Header() {
             alt="logo"
             className="h-5 w-5 md:h-8 md:w-8"
           />
-          <h1 className="text-xl font-medium text-[#25292F] md:text-3xl">
-          OurChatBot 
-          </h1>
         </Link>
         {/* buttons */}
         <div className="flex w-fit items-center gap-[22px]">

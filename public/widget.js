@@ -1,4 +1,4 @@
-(function() {
+(function () {
   // Create widget container
   const container = document.createElement('div');
   container.id = 'chatbot-widget-container';
@@ -13,8 +13,8 @@
   const aiId = script?.getAttribute('data-ai-id');
   // Get base URL from the script src
   const scriptUrl = new URL(script.src);
-  const baseUrl = "https://red-delight-414207.uc.r.appspot.com"; 
-  
+  const baseUrl = 'https://red-delight-414207.uc.r.appspot.com';
+
   if (!aiId) {
     console.error('No AI ID provided in data-ai-id attribute');
     return;
@@ -24,7 +24,10 @@
 
   // Create toggle button
   const toggleButton = document.createElement('button');
-  toggleButton.innerHTML = 'Chat';
+  toggleButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-robot" viewBox="0 0 16 16">
+  <path d="M6 12.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5M3 8.062C3 6.76 4.235 5.765 5.53 5.886a26.6 26.6 0 0 0 4.94 0C11.765 5.765 13 6.76 13 8.062v1.157a.93.93 0 0 1-.765.935c-.845.147-2.34.346-4.235.346s-3.39-.2-4.235-.346A.93.93 0 0 1 3 9.219zm4.542-.827a.25.25 0 0 0-.217.068l-.92.9a25 25 0 0 1-1.871-.183.25.25 0 0 0-.068.495c.55.076 1.232.149 2.02.193a.25.25 0 0 0 .189-.071l.754-.736.847 1.71a.25.25 0 0 0 .404.062l.932-.97a25 25 0 0 0 1.922-.188.25.25 0 0 0-.068-.495c-.538.074-1.207.145-1.98.189a.25.25 0 0 0-.166.076l-.754.785-.842-1.7a.25.25 0 0 0-.182-.135"/>
+  <path d="M8.5 1.866a1 1 0 1 0-1 0V3h-2A4.5 4.5 0 0 0 1 7.5V8a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1v1a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-1a1 1 0 0 0 1-1V9a1 1 0 0 0-1-1v-.5A4.5 4.5 0 0 0 10.5 3h-2zM14 7.5V13a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V7.5A3.5 3.5 0 0 1 5.5 4h5A3.5 3.5 0 0 1 14 7.5"/>
+</svg>`;
   toggleButton.style.padding = '10px 20px';
   toggleButton.style.backgroundColor = '#0070f3';
   toggleButton.style.color = 'white';
@@ -52,8 +55,11 @@
       initializeChatbot();
     } else {
       chatContainer.style.display = 'none';
-      toggleButton.innerHTML = 'Chat';
-    }
+      toggleButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-robot" viewBox="0 0 16 16">
+  <path d="M6 12.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5M3 8.062C3 6.76 4.235 5.765 5.53 5.886a26.6 26.6 0 0 0 4.94 0C11.765 5.765 13 6.76 13 8.062v1.157a.93.93 0 0 1-.765.935c-.845.147-2.34.346-4.235.346s-3.39-.2-4.235-.346A.93.93 0 0 1 3 9.219zm4.542-.827a.25.25 0 0 0-.217.068l-.92.9a25 25 0 0 1-1.871-.183.25.25 0 0 0-.068.495c.55.076 1.232.149 2.02.193a.25.25 0 0 0 .189-.071l.754-.736.847 1.71a.25.25 0 0 0 .404.062l.932-.97a25 25 0 0 0 1.922-.188.25.25 0 0 0-.068-.495c-.538.074-1.207.145-1.98.189a.25.25 0 0 0-.166.076l-.754.785-.842-1.7a.25.25 0 0 0-.182-.135"/>
+  <path d="M8.5 1.866a1 1 0 1 0-1 0V3h-2A4.5 4.5 0 0 0 1 7.5V8a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1v1a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-1a1 1 0 0 0 1-1V9a1 1 0 0 0-1-1v-.5A4.5 4.5 0 0 0 10.5 3h-2zM14 7.5V13a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V7.5A3.5 3.5 0 0 1 5.5 4h5A3.5 3.5 0 0 1 14 7.5"/>
+</svg>`; 
+}
   };
 
   // Function to initialize chatbot
@@ -66,25 +72,31 @@
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          userid: aiId
-        })
+          userid: aiId,
+        }),
       });
 
       console.log('Response status:', response.status);
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       const data = await response.json();
       console.log('Received data:', data);
 
       if (data.error) {
         throw new Error(data.error);
       }
-      
-      const { name = 'Assistant', color = '#0070f3', about = '', faqs = [], language = 'en' } = data;
-      
+
+      const {
+        name = 'Assistant',
+        color = '#0070f3',
+        about = '',
+        faqs = [],
+        language = 'en',
+      } = data;
+
       // Create chat interface
       chatContainer.innerHTML = `
         <div style="padding: 20px;">
@@ -106,7 +118,6 @@
         </div>
       `;
 
-
       const input = document.getElementById('chat-input');
       const sendButton = document.getElementById('chat-send-button');
       const messages = document.getElementById('chat-messages');
@@ -125,7 +136,7 @@
         if (!input.value.trim()) return;
 
         const userMessage = input.value.trim();
-        
+
         // Add user message
         messages.innerHTML += `
           <div style="margin-bottom: 10px; text-align: right;">
@@ -137,7 +148,7 @@
 
         // Clear input
         input.value = '';
-        
+
         // Add loading indicator
         const loadingDiv = document.createElement('div');
         loadingDiv.innerHTML = `
@@ -166,7 +177,7 @@
 
       FAQs
       ${JSON.stringify(faqs)}`;
-      
+
           const response = await fetch(`${baseUrl}/api/chat`, {
             method: 'POST',
             headers: {
@@ -174,8 +185,8 @@
             },
             body: JSON.stringify({
               message: userMessage,
-              systemPrompt: systemPrompt
-            })
+              systemPrompt: systemPrompt,
+            }),
           });
 
           if (!response.ok) {
@@ -188,7 +199,10 @@
           messages.innerHTML += `
             <div style="margin-bottom: 10px; text-align: left;">
               <span style="background-color: #f5f5f5; padding: 8px; border-radius: 4px; display: inline-block;">
-                ${data.response || 'Sorry, I encountered an error. Please try again.'}
+                ${
+                  data.response ||
+                  'Sorry, I encountered an error. Please try again.'
+                }
               </span>
             </div>
           `;
@@ -207,7 +221,6 @@
 
         messages.scrollTop = messages.scrollHeight;
       }
-      
     } catch (error) {
       console.error('Error loading chatbot:', error);
       chatContainer.innerHTML = `

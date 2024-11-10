@@ -1,4 +1,4 @@
-import { FaMicrophoneAlt } from "react-icons/fa";
+import { FaChartLine, FaClock, FaDatabase, FaGlobe, FaMicrophoneAlt, FaRobot, FaUserCog } from "react-icons/fa";
 import { FaMobileAlt } from "react-icons/fa";
 import { MdDashboardCustomize } from "react-icons/md";
 import { GrOptimize, GrDeploy } from "react-icons/gr";
@@ -10,39 +10,34 @@ import { MdQuiz } from "react-icons/md";
 export const FeaturesList = {
   FRETURES_EN: [
     {
-      icon: FaMicrophoneAlt,
-      title: "Record Your Classes",
-      description: "Record your classes and have them become a knowledge base for your studies",
+      icon: FaRobot,
+      title: "Instant Website Integration",
+      description: "Simply paste your website URL and get an AI-powered chatbot customized to your business needs within minutes",
     },
     {
-      icon: IoIosCloudUpload,
-      title: "Upload your Class Media",
-      description:
-        "Upload your lectures notes, audios, videos, photos and have Gemini transform them into searchable knowledge base",
+      icon: FaGlobe,
+      title: "Multilingual Support",
+      description: "Choose from multiple languages to serve your global customers with Gemini AI's advanced language processing capabilities",
     },
     {
-      icon: FaEarthAsia,
-      title: "Globalization Support",
-      description:
-        "Supports multiple languages, making it effortless to change to the language of your choice and have Gemini generate notes, quizzes, flashcards flawlessly",
+      icon: FaDatabase,
+      title: "Knowledge Base Creation",
+      description: "Automatically scans your website content to build a comprehensive knowledge base for accurate customer responses",
     },
     {
-      icon: MdAudioFile,
-      title: "Generate Audio Lectures",
-      description:
-        "Generate audio lectures in the language of your choice and learn by listening to any topic of your choice",
+      icon: FaClock,
+      title: "24/7 Availability",
+      description: "Provide round-the-clock customer support without human intervention, ensuring your customers are always assisted",
     },
     {
-      icon: MdQuiz,
-      title: "Generate Quizzes & flashcards",
-      description:
-        "Test your knowledge with quizzes and flashcards from your uploaded media and share with friends to get them learning too",
+      icon: FaChartLine,
+      title: "Analytics Dashboard",
+      description: "Track customer interactions, popular queries, and chatbot performance with detailed analytics and insights",
     },
     {
-      icon: FaEarthAsia,
-      title: "AI lecturer",
-      description:
-        "Interact with a real time ai lecturer with access to your class media",
+      icon: FaUserCog,
+      title: "Customizable Responses",
+      description: "Train your chatbot with custom responses and business-specific information for more accurate and personalized customer support",
     },
   ],
 

@@ -1,66 +1,66 @@
 export const FAQList = {
-    FAQ_EN: [
-      {
-        question: "What is a landing page?",
-        answer:
-          "A landing page is a standalone web page created specifically for a marketing or advertising campaign. It's where a visitor 'lands' after they click on a link in an email, or ads from Google, Bing, YouTube, Facebook, Instagram, Twitter, or similar places on the web. Unlike web pages, which typically have many goals and encourage exploration, landing pages are designed with a single focus or goal, known as a call to action (CTA).",
-      },
-      {
-        question: "How can I create a landing page?",
-        answer:
-          "Creating a landing page can be done in several steps: 1) Choose a landing page template that fits your campaign's needs or start from scratch. 2) Identify your landing page's objective and CTA. 3) Write compelling answer that urges visitors to take action. 4) Incorporate design elements such as images, videos, and forms that align with your message. 5) Test your page's usability and mobile responsiveness. 6) Use SEO best practices to help your page get found. 7) Publish your landing page and monitor its performance to make adjustments as needed.",
-      },
-      {
-        question: "Why is a landing page important?",
-        answer:
-          "Landing pages are crucial for any marketing strategy because they provide a targeted platform for converting visitors into leads or customers. Unlike general websites, landing pages focus the visitor's attention on a single offer, minimizing distractions and guiding them towards a specific action. This focused approach can significantly increase the effectiveness of your marketing campaigns, improve your ad performance, and enhance the overall user experience by providing them with the information or solution they were seeking.",
-      },
-      {
-        question: "Why choose our landing page boilerplate?",
-        answer:
-          "Our landing page template is free, open-source, and powerful, making it ideal for various projects and marketing campaigns. It allows you to create a landing page in under an hour, simplifying the development process while also offering a high degree of customization and responsiveness.",
-      },
-      {
-        question: "What skills do I need to use this template?",
-        answer:
-          "To use our landing page template, you only need basic web editing skills. The design of the template is intended to be easy for non-technical users to get started with, while also providing high customizability for experienced developers.",
-      },
-      {
-        question: "How do I get started with the landing page template?",
-        answer:
-          "Getting started is very simple. Just download the source code from our GitHub repository, edit the text and images as needed, and then deploy it to your server.",
-      },
-      {
-        question: "Does the landing page template support responsive design?",
-        answer:
-          "Yes, our landing page template supports responsive design, ensuring that your webpage displays perfectly on a variety of devices, whether desktop, tablet, or smartphone.",
-      },
-      {
-        question: "Can I use this template for a commercial project?",
-        answer:
-          "Absolutely. Our template is open-source, and you can use it for any type of project, including commercial purposes. We encourage users to utilize this template to create and optimize their online projects.",
-      },
-      {
-        question: "Do you offer any customization services?",
-        answer:
-          "We accept paid custom development of landing pages. Please contact us via email at karma.zhao@gmail.com or Twitter @huglemon.",
-      },
-      {
-        question: "Are there any restrictions on using this template?",
-        answer:
-          "No. You are free to use and modify this template. At the same time, we encourage developers to submit PRs to help improve this landing page template together.",
-      },
-      {
-        question: "Does this template include SEO optimization features?",
-        answer:
-          "Yes, our template includes basic SEO optimization features to help your webpage achieve better rankings in search engines.",
-      },
-      {
-        question: "What should I do if I encounter problems using the template?",
-        answer:
-          "If you encounter any issues while using the template, please contact us via Twitter @huglemon.",
-      },
-    ],
+  FAQ_EN: [
+    {
+      question: "What is an AI Customer Support Chatbot?",
+      answer:
+        "An AI Customer Support Chatbot is an intelligent virtual assistant powered by Gemini AI that provides 24/7 automated customer service by understanding and responding to customer queries based on your website's content. It acts as a first-line support system, handling common customer questions and issues automatically.",
+    },
+    {
+      question: "How do I set up the chatbot for my website?",
+      answer:
+        "Setting up is simple and takes just a few steps: 1) Paste your website URL in the designated field. 2) Select your preferred language from the available options. 3) Wait while Gemini AI analyzes your website content. 4) Review and customize the generated responses if needed. 5) Deploy the chatbot to your website using the provided integration code.",
+    },
+    {
+      question: "What languages does the chatbot support?",
+      answer:
+        "The chatbot supports multiple languages thanks to Gemini AI's advanced language processing capabilities. You can select your preferred language during setup, and the chatbot will automatically handle customer queries in that language, making it ideal for businesses with a global customer base.",
+    },
+    {
+      question: "How does the chatbot learn about my business?",
+      answer:
+        "The chatbot automatically scans and analyzes your website content to build a comprehensive knowledge base about your business. It uses Gemini AI to understand your products, services, policies, and common customer queries, ensuring accurate and relevant responses to customer questions.",
+    },
+    {
+      question: "Can I customize the chatbot's responses?",
+      answer:
+        "Yes, you can fully customize the chatbot's responses. While it automatically generates responses based on your website content, you can review and modify any responses, add custom responses for specific queries, and train the chatbot with business-specific information to ensure it perfectly represents your brand voice.",
+    },
+    {
+      question: "How do I monitor the chatbot's performance?",
+      answer:
+        "The chatbot comes with a built-in analytics dashboard that allows you to track important metrics such as number of conversations, popular customer queries, resolution rates, and customer satisfaction scores. This data helps you optimize the chatbot's performance and identify areas for improvement.",
+    },
+    {
+      question: "Is the chatbot available 24/7?",
+      answer:
+        "Yes, the chatbot provides round-the-clock customer support without any downtime. It can handle multiple customer conversations simultaneously, ensuring your customers receive immediate assistance at any time, even outside of business hours.",
+    },
+    {
+      question: "What types of questions can the chatbot handle?",
+      answer:
+        "The chatbot can handle a wide range of customer queries including product information, pricing, shipping policies, return policies, technical support, and general FAQs. It's trained on your website content and can provide accurate, relevant responses based on your business information.",
+    },
+    {
+      question: "Do you offer technical support for the chatbot?",
+      answer:
+        "Yes, we provide technical support to help you set up and optimize your chatbot. If you encounter any issues or need assistance, you can reach out to our support team, and we'll help you resolve any problems.",
+    },
+    {
+      question: "Can I integrate the chatbot with my existing customer service tools?",
+      answer:
+        "Yes, the chatbot can be integrated with various customer service platforms and tools. It can seamlessly hand over complex queries to human agents when needed and maintain conversation history for better customer service continuity.",
+    },
+    {
+      question: "Is my customer data secure with the chatbot?",
+      answer:
+        "Yes, we prioritize data security and privacy. All customer conversations are encrypted, and the chatbot follows strict data protection protocols to ensure your customer information remains secure and confidential.",
+    },
+    {
+      question: "How do I get started with the chatbot?",
+      answer:
+        "Getting started is easy - simply visit our website, paste your website URL in the designated field, select your preferred language, and let Gemini AI create a customized chatbot for your business. The entire process takes just a few minutes.",
+    },
+  ],
   
     FAQ_ZH: [
       {
