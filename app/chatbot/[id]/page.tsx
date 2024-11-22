@@ -30,7 +30,7 @@ const ChatbotPage = () => {
 
   const id = pathname.match(/\/chatbot\/([a-f0-9-]+)/)?.[1];
 
-  const chatbotlink = `<script data-ai-id="${id}" src="http://localhost:3000/widget.js"></script>`
+  const chatbotlink = `<script data-ai-id="${id}" src="https://ourchatbot.vercel.app/widget.js"></script>`
 
   // useEffect(() => {
   //   const script = document.createElement("script");
