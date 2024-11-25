@@ -1,12 +1,11 @@
 <p align="center">
-  Generate notes, quizzes and talk with an interactive ai lecturer from your notes
+  Create Your Own 24/7 Customer Support chatbot by pasting your website link
 </p>
 
 ## Tech Stack
 
-- [Gemini API](https://ai.google.dev/gemini-api/docs/models/gemini) for generating embeddings, generating lecture text, quizzes and processing audio, video into text
+- [Gemini API](https://ai.google.dev/gemini-api/docs/models/gemini) for generating embeddings, generating  text
 - Next.js [App Router](https://nextjs.org/docs/app) for the framework
-- [Deepgram](https://deepgram.com/) for STT and TTS 
 - [Firebase storage](https://firebase.google.com/docs/firestore) for file storage of txt, audio, video
 - [Supabase](https://supabase.com/) for database including embedding storage
 - [Tailwind CSS](https://tailwindcss.com/) for styling
